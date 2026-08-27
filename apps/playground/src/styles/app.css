@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* ---------- shadcn/ui 的变量骨架 ----------
+   glasscn 会接管其中的表面类 token，这里保留完整定义是为了：
+   1. @theme inline 的映射要有源
+   2. 没被接管的 token（chart-*、字体等）仍然可用
+   3. 移除 glasscn 那一行 import，这里就退回原味 shadcn —— 可逆 */
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ---------- glasscn：一行接管 ---------- */
+@import "@glasscn/core";
+@import "@glasscn/core/palettes/switchable.css";
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    margin: 0;
+    color: var(--glass-text-primary);
+    font-family: var(--glass-font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--glass-font-heading);
+    letter-spacing: var(--glass-tracking-heading);
+    color: var(--glass-text-primary);
+  }
+
+  h1 { font-size: var(--glass-text-h1); font-weight: 800; }
+  h2 { font-size: var(--glass-text-h2); font-weight: 700; }
+  h3 { font-size: var(--glass-text-h3); font-weight: 600; }
+
+  p {
+    line-height: var(--glass-leading-body);
+    color: var(--glass-text-secondary);
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--glass-accent) 35%, transparent);
+    color: var(--glass-text-primary);
+  }
+}

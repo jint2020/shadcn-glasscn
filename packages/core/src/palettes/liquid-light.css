@@ -1,0 +1,99 @@
+/* ============================================================================
+ * @glasscn/core/palettes/liquid-light — Liquid Glass / Light —— 暖米白底 + 紫青橙光斑。唯一的浅色调色，玻璃更实、高光更厚
+ * ----------------------------------------------------------------------------
+ * 两种用法：
+ *   1. 静态套用 —— @import 本文件，全站生效
+ *   2. 运行时切换 —— <html data-glass-palette="liquid-light">
+ *
+ * 玻璃填充在所有调色里都是白色中性，这里只换背景光斑、强调色和文字色调。
+ * ==========================================================================*/
+
+:root {
+  --glass-bg-base: #f0ebe3;
+  --glass-bg-mid: #e6dfd4;
+  --glass-blob-1: #a78bfa;
+  --glass-blob-2: #5eead4;
+  --glass-blob-3: #fb923c;
+  --glass-accent: #7c3aed;
+  --glass-accent-hover: #8b5cf6;
+  --glass-accent-fg: #faf7ff;
+  color-scheme: light;
+
+  /* 浅底上的玻璃：白色填充在白底上几乎看不见，所以要拉高不透明度，
+     并把描边换成暗色 —— 否则面板边界会整个消失。 */
+  --glass-fill: 0.45;
+  --glass-fill-hover: 0.58;
+  --glass-border-alpha: 0.6;
+  --glass-border-alpha-hover: 0.8;
+
+  /* 浅色下玻璃更厚：blur 24 / saturate 200%，高光更亮更粗，
+     并且底边多一道极淡的暗线 —— 浅底上只有顶高光会让面板"飘"，
+     底边那道暗线把它按回平面里。 */
+  --glass-blur-base: 24px;
+  --glass-saturate: 200%;
+  --glass-specular: 0.8;
+  --glass-specular-size: 0 2px 0 0;
+  --glass-underline: 0 -1px 0 0 rgb(0 0 0 / 0.06) inset;
+
+  --glass-shadow-base: 0 8px 32px rgb(0 0 0 / 0.12);
+  --glass-shadow-hover: 0 16px 48px rgb(0 0 0 / 0.18);
+
+  /* 浅色下文字是近黑，不是深灰 —— 深灰压在接近透明的玻璃上会糊 */
+  --glass-text-rgb: 20 16 12;
+  --glass-text-primary: rgb(var(--glass-text-rgb) / 0.9);
+  --glass-text-secondary: rgb(var(--glass-text-rgb) / 0.62);
+  --glass-text-muted: rgb(var(--glass-text-rgb) / 0.45);
+
+  --glass-danger: #b91c1c;
+  --glass-danger-fg: #fff5f5;
+}
+
+:root[data-glass-palette="liquid-light"] {
+  --glass-bg-base: #f0ebe3;
+  --glass-bg-mid: #e6dfd4;
+  --glass-blob-1: #a78bfa;
+  --glass-blob-2: #5eead4;
+  --glass-blob-3: #fb923c;
+  --glass-accent: #7c3aed;
+  --glass-accent-hover: #8b5cf6;
+  --glass-accent-fg: #faf7ff;
+  color-scheme: light;
+
+  /* 浅底上的玻璃：白色填充在白底上几乎看不见，所以要拉高不透明度，
+     并把描边换成暗色 —— 否则面板边界会整个消失。 */
+  --glass-fill: 0.45;
+  --glass-fill-hover: 0.58;
+  --glass-border-alpha: 0.6;
+  --glass-border-alpha-hover: 0.8;
+
+  /* 浅色下玻璃更厚：blur 24 / saturate 200%，高光更亮更粗，
+     并且底边多一道极淡的暗线 —— 浅底上只有顶高光会让面板"飘"，
+     底边那道暗线把它按回平面里。 */
+  --glass-blur-base: 24px;
+  --glass-saturate: 200%;
+  --glass-specular: 0.8;
+  --glass-specular-size: 0 2px 0 0;
+  --glass-underline: 0 -1px 0 0 rgb(0 0 0 / 0.06) inset;
+
+  --glass-shadow-base: 0 8px 32px rgb(0 0 0 / 0.12);
+  --glass-shadow-hover: 0 16px 48px rgb(0 0 0 / 0.18);
+
+  /* 浅色下文字是近黑，不是深灰 —— 深灰压在接近透明的玻璃上会糊 */
+  --glass-text-rgb: 20 16 12;
+  --glass-text-primary: rgb(var(--glass-text-rgb) / 0.9);
+  --glass-text-secondary: rgb(var(--glass-text-rgb) / 0.62);
+  --glass-text-muted: rgb(var(--glass-text-rgb) / 0.45);
+
+  --glass-danger: #b91c1c;
+  --glass-danger-fg: #fff5f5;
+}
+
+/* 浅色下四档填充一起抬，否则 flat 档（输入框、徽章）会彻底消失 */
+:root, :root[data-glass-palette="liquid-light"] {
+  --glass-fill-flat: 0.36;
+  --glass-fill-raised: 0.45;
+  --glass-fill-overlay: 0.58;
+  --glass-fill-modal: 0.7;
+  --glass-fill-nav: 0.42;
+  --glass-scrim: rgb(60 45 30 / 0.35);
+}

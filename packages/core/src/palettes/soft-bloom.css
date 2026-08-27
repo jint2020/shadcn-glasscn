@@ -1,0 +1,35 @@
+/* ============================================================================
+ * @glasscn/core/palettes/soft-bloom — Soft Bloom —— 紫调暗底 + 紫粉靛光斑。柔和、有情绪，适合内容型与创意类界面
+ * ----------------------------------------------------------------------------
+ * 两种用法：
+ *   1. 静态套用 —— @import 本文件，全站生效
+ *   2. 运行时切换 —— <html data-glass-palette="soft-bloom">
+ *
+ * 玻璃填充在所有调色里都是白色中性，这里只换背景光斑、强调色和文字色调。
+ * ==========================================================================*/
+
+:root {
+  --glass-bg-base: #1a0e1c;
+  --glass-bg-mid: #2a1830;
+  --glass-blob-1: #c084fc;
+  --glass-blob-2: #f472b6;
+  --glass-blob-3: #818cf8;
+  --glass-accent: #e879f9;
+  --glass-accent-hover: #f0abfc;
+  --glass-accent-fg: #1a0a1c;
+  --glass-text-rgb: 253 244 255;
+  color-scheme: dark;
+}
+
+:root[data-glass-palette="soft-bloom"] {
+  --glass-bg-base: #1a0e1c;
+  --glass-bg-mid: #2a1830;
+  --glass-blob-1: #c084fc;
+  --glass-blob-2: #f472b6;
+  --glass-blob-3: #818cf8;
+  --glass-accent: #e879f9;
+  --glass-accent-hover: #f0abfc;
+  --glass-accent-fg: #1a0a1c;
+  --glass-text-rgb: 253 244 255;
+  color-scheme: dark;
+}

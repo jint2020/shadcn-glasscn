@@ -1,0 +1,128 @@
+/* ============================================================================
+ * @glasscn/core — 背景系统 (Backdrop)
+ * ----------------------------------------------------------------------------
+ * 这一层不是装饰，是整套设计的颜色来源。
+ *
+ * 玻璃只在丰富、有颜色的背景上才对。平底或灰底会产出"脏玻璃"——
+ * 模糊拾取不到任何颜色，面板看起来就是一块灰板。
+ *
+ * 三团光斑，各自缓慢漂移：
+ *   blob 1  650px  左上   opacity .55
+ *   blob 2  450px  右下   delay -4s
+ *   blob 3  350px  居中   delay -7s
+ *
+ * 只动 transform（translate + scale）。绝不动 color 或 filter ——
+ * 那些属性每帧都要重新光栅化整块模糊，一动就掉帧。
+ * ==========================================================================*/
+
+@keyframes glass-blob-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(6%, -8%, 0) scale(1.12);
+  }
+  66% {
+    transform: translate3d(-5%, 6%, 0) scale(0.92);
+  }
+}
+
+@utility glass-backdrop {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background-color: var(--glass-bg-base);
+  background-image: linear-gradient(
+    160deg,
+    var(--glass-bg-base) 0%,
+    var(--glass-bg-mid) 55%,
+    var(--glass-bg-base) 100%
+  );
+  color: var(--glass-text-primary);
+  font-family: var(--glass-font-body);
+
+  /* 光斑容器固定在视口上：内容滚动时背景不动，玻璃面板扫过不同的颜色区域，
+     这正是"手里握着一块玻璃"的感觉来源。
+     用 position: fixed 的伪元素而不是 background-attachment: fixed ——
+     后者在 iOS Safari 上完全不生效。 */
+  &::before,
+  &::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    border-radius: 50%;
+    pointer-events: none;
+    will-change: transform;
+    animation: glass-blob-float 10s var(--glass-ease-in-out) infinite;
+  }
+
+  /* blob 1 —— 左上，最大最亮 */
+  &::before {
+    width: 650px;
+    height: 650px;
+    top: -12%;
+    left: -8%;
+    opacity: 0.55;
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--glass-blob-1) 0%,
+      transparent 68%
+    );
+    filter: blur(90px);
+  }
+
+  /* blob 2 —— 右下 */
+  &::after {
+    width: 450px;
+    height: 450px;
+    right: -6%;
+    bottom: -10%;
+    opacity: 0.5;
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--glass-blob-2) 0%,
+      transparent 68%
+    );
+    filter: blur(90px);
+    animation-delay: -4s;
+  }
+}
+
+/* blob 3 —— 居中偏右，要单独一个元素承载。
+   放在 <div class="glass-blob-accent"> 里，或者挂在内容容器上。 */
+@utility glass-blob-accent {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    top: 38%;
+    left: 46%;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.42;
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--glass-blob-3) 0%,
+      transparent 68%
+    );
+    filter: blur(90px);
+    will-change: transform;
+    animation: glass-blob-float 10s var(--glass-ease-in-out) -7s infinite;
+  }
+}
+
+/* --- 减少动效：光斑停在原位，但保留颜色 --------------------------------- */
+/* 关键是不要把光斑一起删掉 —— 删了玻璃就没有颜色可折射，
+   整个界面会退化成灰板。用户要的是"别动"，不是"别有颜色"。 */
+@media (prefers-reduced-motion: reduce) {
+  .glass-backdrop::before,
+  .glass-backdrop::after,
+  .glass-blob-accent::before {
+    animation: none;
+  }
+}

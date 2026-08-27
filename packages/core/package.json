@@ -1,0 +1,49 @@
+{
+  "name": "@glasscn/core",
+  "version": "0.2.0",
+  "description": "Liquid Glass theme layer for shadcn/ui — dark-first glassmorphism, pure CSS, zero runtime.",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "src"
+  ],
+  "exports": {
+    ".": "./src/index.css",
+    "./headless": "./src/headless.css",
+    "./headless.css": "./src/headless.css",
+    "./tokens/*.css": "./src/tokens/*.css",
+    "./tokens/*": "./src/tokens/*.css",
+    "./primitives/*.css": "./src/primitives/*.css",
+    "./primitives/*": "./src/primitives/*.css",
+    "./bridge/*.css": "./src/bridge/*.css",
+    "./bridge/*": "./src/bridge/*.css",
+    "./package.json": "./package.json",
+    "./palettes/*.css": "./src/palettes/*.css",
+    "./palettes/*": "./src/palettes/*.css"
+  },
+  "keywords": [
+    "shadcn",
+    "shadcn-ui",
+    "tailwindcss",
+    "glassmorphism",
+    "liquid-glass",
+    "theme",
+    "css",
+    "dark"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jint2020/shadcn-glasscn.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://jint2020.github.io/shadcn-glasscn",
+  "bugs": {
+    "url": "https://github.com/jint2020/shadcn-glasscn/issues"
+  }
+}

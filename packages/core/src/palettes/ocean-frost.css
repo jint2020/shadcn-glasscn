@@ -1,0 +1,35 @@
+/* ============================================================================
+ * @glasscn/core/palettes/ocean-frost — Ocean Frost —— 深海蓝底 + 青蓝靛光斑。冷静、克制，适合数据密集界面
+ * ----------------------------------------------------------------------------
+ * 两种用法：
+ *   1. 静态套用 —— @import 本文件，全站生效
+ *   2. 运行时切换 —— <html data-glass-palette="ocean-frost">
+ *
+ * 玻璃填充在所有调色里都是白色中性，这里只换背景光斑、强调色和文字色调。
+ * ==========================================================================*/
+
+:root {
+  --glass-bg-base: #030d1a;
+  --glass-bg-mid: #07182b;
+  --glass-blob-1: #06b6d4;
+  --glass-blob-2: #0ea5e9;
+  --glass-blob-3: #6366f1;
+  --glass-accent: #22d3ee;
+  --glass-accent-hover: #67e8f9;
+  --glass-accent-fg: #031018;
+  --glass-text-rgb: 240 249 255;
+  color-scheme: dark;
+}
+
+:root[data-glass-palette="ocean-frost"] {
+  --glass-bg-base: #030d1a;
+  --glass-bg-mid: #07182b;
+  --glass-blob-1: #06b6d4;
+  --glass-blob-2: #0ea5e9;
+  --glass-blob-3: #6366f1;
+  --glass-accent: #22d3ee;
+  --glass-accent-hover: #67e8f9;
+  --glass-accent-fg: #031018;
+  --glass-text-rgb: 240 249 255;
+  color-scheme: dark;
+}

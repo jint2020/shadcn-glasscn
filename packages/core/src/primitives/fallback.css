@@ -1,0 +1,193 @@
+/* ============================================================================
+ * @glasscn/core — 降级与无障碍 (Fallback & A11y)
+ * ----------------------------------------------------------------------------
+ * 玻璃拟态的失败模式很危险：backdrop-filter 一旦不生效，
+ * rgba(255,255,255,0.08) 的面板就变成"几乎看不见的框"，
+ * 文字直接压在动画光斑上——不可读。
+ * 所以降级不是锦上添花，是这套库能不能上生产的分界线。
+ *
+ * 降级方向和亮色主题相反：这里要退到**接近不透明的暗色**，
+ * 不是白色。白色 0.94 压在近黑底上会变成一块刺眼的白板。
+ *
+ * 关于这一整层的 !important —— 不是偷懒，是必须的：
+ * 调色用 :root[data-glass-palette="x"]（0,2,0）声明变量，
+ * 会稳压这里的 :root（0,1,0）。不加的话用户一旦切换调色，
+ * 整层无障碍降级就被静默压掉——自动化测不出来，只有真实用户会踩到。
+ * ==========================================================================*/
+
+/* 降级用的实底。跟着调色走，浅色调色里会被覆写成浅底。 */
+:root {
+  --glass-solid: 20 16 12;
+}
+
+:root[data-glass-palette="ocean-frost"] { --glass-solid: 6 16 30; }
+:root[data-glass-palette="soft-bloom"] { --glass-solid: 28 16 32; }
+:root[data-glass-palette="warm-sunset"] { --glass-solid: 30 14 12; }
+:root[data-glass-palette="emerald-mist"] { --glass-solid: 8 28 16; }
+:root[data-glass-palette="liquid-light"] { --glass-solid: 244 240 233; }
+
+/* --- 1. 浏览器不支持 backdrop-filter ------------------------------------- */
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-surface,
+  .glass-nav,
+  .glass-menu,
+  [data-slot] {
+    background-color: rgb(var(--glass-solid) / 0.9) !important;
+  }
+}
+
+/* --- 2. 用户要求减少透明度 ------------------------------------------------- */
+/* macOS「减弱透明度」/ Windows 关闭「透明效果」时命中。
+   这是明确的用户意图，优先级高于设计意图。 */
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-blur-base: 0px !important;
+    --glass-saturate: 100% !important;
+    --glass-shimmer-alpha: 0 !important;
+  }
+
+  .glass-surface,
+  .glass-nav,
+  .glass-menu,
+  [data-slot] {
+    background-color: rgb(var(--glass-solid) / 0.94) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* 光斑保留但压暗：完全去掉会让界面变成一块死板，
+     用户要的是"别透"，不是"别有颜色"。 */
+  .glass-backdrop::before,
+  .glass-backdrop::after,
+  .glass-blob-accent::before {
+    opacity: 0.22 !important;
+  }
+}
+
+/* --- 3. 增强对比度 --------------------------------------------------------- */
+
+@media (prefers-contrast: more) {
+  :root {
+    --glass-border-alpha: 0.55 !important;
+    --glass-border-alpha-hover: 0.85 !important;
+    --glass-border-width: 1.5px !important;
+    --glass-shimmer-alpha: 0 !important;
+    --glass-text-secondary: rgb(var(--glass-text-rgb) / 0.92) !important;
+    --glass-text-muted: rgb(var(--glass-text-rgb) / 0.72) !important;
+  }
+
+  .glass-surface,
+  .glass-nav,
+  .glass-menu,
+  [data-slot] {
+    background-color: rgb(var(--glass-solid) / 0.96) !important;
+  }
+}
+
+/* --- 4. 减少动效 ----------------------------------------------------------- */
+/* 技能要求的兜底：所有动画与过渡压到近零，揭示元素立即可见。 */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --glass-duration-fast: 0.01ms !important;
+    --glass-duration: 0.01ms !important;
+    --glass-duration-slow: 0.01ms !important;
+    --glass-lift: 0px !important;
+    --glass-press: 0px !important;
+    --glass-press-scale: 1 !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .glass-reveal,
+  .glass-reveal:not(.is-revealed) {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+}
+
+/* --- 5. 打印 --------------------------------------------------------------- */
+
+@media print {
+  :root {
+    --glass-blur-base: 0px !important;
+    --glass-text-rgb: 20 16 12 !important;
+  }
+
+  /* 滚动揭示在打印时必须强制可见。
+     打印不产生滚动，scroll-driven 动画的时间轴永远停在起点，
+     整页内容会以 opacity: 0 印出来 —— 一张白纸。
+     同样的坑：打印预览、无头截图服务、部分爬虫。 */
+  .glass-reveal,
+  .glass-reveal:not(.is-revealed) {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+
+  .glass-backdrop::before,
+  .glass-backdrop::after,
+  .glass-blob-accent::before {
+    display: none !important;
+  }
+
+  .glass-surface,
+  .glass-nav,
+  .glass-menu,
+  [data-slot] {
+    background: #fff !important;
+    border-color: #999 !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* --- 6. 性能逃生阀 --------------------------------------------------------- */
+/* backdrop-filter 是逐帧重绘的合成层。长列表 / 低端安卓 / 虚拟滚动里
+   很容易掉帧。任意祖先挂 data-glass-perf="lite"（可由 useGlassPerf 自动挂），
+   整棵子树退回纯色，布局完全不变。 */
+
+[data-glass-perf="lite"] {
+  --glass-blur-base: 0px;
+  --glass-saturate: 100%;
+
+  & .glass-surface,
+  & .glass-nav,
+  & .glass-menu,
+  & [data-slot] {
+    background-color: rgb(var(--glass-solid) / 0.92) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* 光斑的 blur(90px) 同样昂贵，一并降级 */
+  & .glass-backdrop::before,
+  & .glass-backdrop::after,
+  & .glass-blob-accent::before {
+    animation: none !important;
+    filter: blur(40px) !important;
+  }
+}
+
+/* --- 7. 文字可读性护栏 ------------------------------------------------------ */
+/* 光斑最亮处压着的正文会被洗掉。极轻的文字阴影成本远低于再加一层遮罩。 */
+
+@utility glass-legible {
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.45);
+
+  @media (prefers-contrast: more) {
+    text-shadow: none;
+  }
+}

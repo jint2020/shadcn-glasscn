@@ -1,0 +1,35 @@
+/* ============================================================================
+ * @glasscn/core/palettes/ember-slate — Ember & Slate —— 暖调近黑 + 琥珀赭石。默认，适合产品后台与工具型界面
+ * ----------------------------------------------------------------------------
+ * 两种用法：
+ *   1. 静态套用 —— @import 本文件，全站生效
+ *   2. 运行时切换 —— <html data-glass-palette="ember-slate">
+ *
+ * 玻璃填充在所有调色里都是白色中性，这里只换背景光斑、强调色和文字色调。
+ * ==========================================================================*/
+
+:root {
+  --glass-bg-base: #100d0a;
+  --glass-bg-mid: #1c1510;
+  --glass-blob-1: #c2410c;
+  --glass-blob-2: #78350f;
+  --glass-blob-3: #f59e0b;
+  --glass-accent: #f59e0b;
+  --glass-accent-hover: #fbbf24;
+  --glass-accent-fg: #1a1206;
+  --glass-text-rgb: 255 248 240;
+  color-scheme: dark;
+}
+
+:root[data-glass-palette="ember-slate"] {
+  --glass-bg-base: #100d0a;
+  --glass-bg-mid: #1c1510;
+  --glass-blob-1: #c2410c;
+  --glass-blob-2: #78350f;
+  --glass-blob-3: #f59e0b;
+  --glass-accent: #f59e0b;
+  --glass-accent-hover: #fbbf24;
+  --glass-accent-fg: #1a1206;
+  --glass-text-rgb: 255 248 240;
+  color-scheme: dark;
+}

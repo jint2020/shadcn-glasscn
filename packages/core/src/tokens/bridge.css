@@ -1,0 +1,106 @@
+/* ============================================================================
+ * @glasscn/core — shadcn 变量桥 (Token Bridge)
+ * ----------------------------------------------------------------------------
+ * 与 shadcn 集成的核心策略：接管变量，而不是覆写属性。
+ *
+ * shadcn 组件写的是 `bg-card` `border` `shadow-sm`，都是 Tailwind 工具类
+ * (0,1,0)。如果用 `[data-slot=card] { background: ... }` 去压它，
+ * 会连用户自己写的 `className="bg-white/70"` 一起压掉——库变得不可覆写。
+ *
+ * 所以：shadcn 已经设过的属性只改背后的变量；
+ * 它从不设的属性（backdrop-filter、微光）才由 bridge/auto.css 补。
+ * ==========================================================================*/
+
+:root {
+  /* --- 页面底：不透明，玻璃需要底下有东西可折射 --------------------------- */
+  --background: var(--glass-bg-base);
+  --foreground: var(--glass-text-primary);
+
+  /* --- 表面类 token 全部换成白色中性玻璃 ---------------------------------- */
+  /* 注意这里没有一个是有色的。玻璃的颜色来自背后的光斑，不是这些变量。 */
+  --card: rgb(var(--glass-white) / var(--glass-fill-raised));
+  --card-foreground: var(--glass-text-primary);
+  --popover: rgb(var(--glass-white) / var(--glass-fill-overlay));
+  --popover-foreground: var(--glass-text-primary);
+  --secondary: rgb(var(--glass-white) / var(--glass-fill-raised));
+  --secondary-foreground: var(--glass-text-primary);
+  --muted: rgb(var(--glass-white) / var(--glass-fill-flat));
+  --accent: rgb(var(--glass-white) / var(--glass-fill-hover));
+  --accent-foreground: var(--glass-text-primary);
+  --input: rgb(var(--glass-white) / var(--glass-fill-flat));
+  --sidebar: rgb(var(--glass-white) / var(--glass-fill-overlay));
+  --sidebar-foreground: var(--glass-text-primary);
+  --sidebar-accent: rgb(var(--glass-white) / var(--glass-fill-hover));
+  --sidebar-accent-foreground: var(--glass-text-primary);
+
+  --border: var(--glass-border);
+  --sidebar-border: var(--glass-border);
+  --ring: var(--glass-accent);
+
+  /* --- 主操作是实心强调色，不是玻璃 --------------------------------------- */
+  /* 一屏全是半透明面板时，主按钮再做成玻璃，用户就找不到"该点哪个"。
+     这是规范里明确的一条，也是可供性问题，不是审美偏好。 */
+  --primary: var(--glass-accent);
+  --primary-foreground: var(--glass-accent-fg);
+  --sidebar-primary: var(--glass-accent);
+  --sidebar-primary-foreground: var(--glass-accent-fg);
+
+  --destructive: var(--glass-danger);
+  --destructive-foreground: var(--glass-danger-fg);
+
+  /* --- 次要文字 ----------------------------------------------------------- */
+  /* 映射到 text-secondary (0.68) 而不是 text-muted (0.38)。
+     muted 在 WCAG 下只有约 3.3:1，规范给它的定位是"占位符、标签"，
+     但 shadcn 的 --muted-foreground 承担的是真正的次要正文
+     （CardDescription、表格副标题、表单说明），必须达到 4.5:1。
+     想要 muted 那一档，直接用 var(--glass-text-muted)。 */
+  --muted-foreground: var(--glass-text-secondary);
+  --sidebar-ring: var(--glass-accent);
+
+  /* --- 圆角：药丸是这套设计的形状签名 ------------------------------------- */
+  /* shadcn 用单个 --radius 派生整个量表：
+     sm = r-4, md = r-2, lg = r, xl = r+4
+     卡片写的是 rounded-xl，所以基准取 16px 让 xl 自然落在规范的 20px。
+     按钮/输入框那些药丸形状，在 auto 层里按元素改对应的 --radius-* 变量 ——
+     不能直接写 border-radius 属性，那是 @layer components，
+     会被组件自带的 rounded-md 工具类（@layer utilities）压掉。 */
+  --radius: 16px;
+}
+
+/* ----------------------------------------------------------------------------
+ * 阴影量表接管
+ * ----------------------------------------------------------------------------
+ * shadcn 组件里散落着 shadow-xs / sm / md / lg。把整个量表换成
+ * "玻璃阴影 = 顶边高光 + 外投影"，现有组件不改一行就有了正确的厚度感。
+ * 用户写 shadow-none 依然完全生效。
+ * ==========================================================================*/
+
+@theme inline {
+  --shadow-2xs: var(--glass-specular-size) var(--glass-specular-color) inset;
+
+  --shadow-xs: var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-underline), 0 2px 8px rgb(0 0 0 / 0.2);
+
+  --shadow-sm: var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-underline), var(--glass-shadow-flat);
+
+  --shadow-md: var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-underline), var(--glass-shadow-raised);
+
+  --shadow-lg: var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-underline), var(--glass-shadow-overlay);
+
+  --shadow-xl: var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-underline), var(--glass-shadow-modal);
+
+  --shadow-2xl: var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-underline), var(--glass-shadow-modal);
+
+  /* 材质变量也暴露成 Tailwind 工具类 */
+  --blur-glass: var(--glass-blur-base);
+  --blur-glass-overlay: var(--glass-blur-overlay);
+  --blur-glass-modal: var(--glass-blur-modal);
+  --ease-glass: var(--glass-ease);
+  --radius-pill: var(--glass-radius-pill);
+  --color-glass-accent: var(--glass-accent);
+}

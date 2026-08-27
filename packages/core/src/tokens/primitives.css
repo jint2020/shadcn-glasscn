@@ -1,0 +1,92 @@
+/* ============================================================================
+ * @glasscn/core — 材质原语 (Material Primitives)
+ * ----------------------------------------------------------------------------
+ * 核心规则，整套体系的地基：
+ *
+ *   玻璃本身没有颜色。它的颜色全部来自背后的背景，
+ *   经过模糊和提亮之后透过面板显出来。
+ *
+ * 所以 glass fill 永远是 rgba(255,255,255,N) —— 白色中性，绝不带色调。
+ * 想换整体气质，换的是背后光斑（blob）的颜色，不是玻璃的颜色。
+ * 这条一破，玻璃立刻变成"有色半透明塑料片"。
+ *
+ * 暗色优先：Ember & Slate 是默认，浅色是 palettes/liquid-light 的变体。
+ * ==========================================================================*/
+
+:root {
+  color-scheme: dark;
+
+  /* --- 折射 -------------------------------------------------------------- */
+  /* 模糊基数。所有档位由它派生，改这一个值整体调厚度。 */
+  --glass-blur-base: 20px;
+
+  /* saturate 必须和 blur 一起用。只有 blur 的话，背后的颜色透过来会发灰，
+     看着像磨砂塑料；saturate 让颜色"绽"出来，这才是玻璃感的真正来源。 */
+  --glass-saturate: 180%;
+  --glass-brightness: 1;
+
+  /* --- 玻璃填充（白色中性，不可改成有色） -------------------------------- */
+  --glass-white: 255 255 255;
+  --glass-fill: 0.08;
+  --glass-fill-hover: 0.13;
+
+  /* 通透度是独立于调色的一条轴。三档，靠 data-glass-density 切换，
+     见 primitives/surface.css 末尾。
+       sheer    几乎全透，背景清晰可见
+       frosted  默认，背景读得出颜色和形状，细节丢失
+       heavy    接近不透明，戏剧化、可读性最好 */
+
+  /* --- 边缘光学 ---------------------------------------------------------- */
+  --glass-border-alpha: 0.12;
+  --glass-border-alpha-hover: 0.22;
+  --glass-border-width: 1px;
+
+  /* 高光 (specular)：顶边 1px 内阴影，模拟玻璃的物理厚度接到顶光。
+     这是 Apple Liquid Glass 的签名，也是"真玻璃"和"一块模糊的板子"
+     之间唯一的区别。不可省。 */
+  --glass-specular: 0.2;
+  --glass-specular-size: 0 1px 0 0;
+
+  /* 底边暗线：暗色下不需要（背景本来就暗），浅色调色里会打开。
+     默认 none，靠调色覆写。 */
+  --glass-underline: 0 0 0 0 transparent;
+
+  /* --- 投影 --------------------------------------------------------------- */
+  /* 比常规暗色 UI 更深，玻璃需要更强的投影才能从背景里分离出来 */
+  --glass-shadow-base: 0 12px 40px rgb(0 0 0 / 0.35);
+  --glass-shadow-hover: 0 20px 60px rgb(0 0 0 / 0.5);
+
+  /* --- 运动 --------------------------------------------------------------- */
+  --glass-duration-fast: 80ms;      /* active 要"啪"地一下，不能拖 */
+  --glass-duration: 320ms;
+  --glass-duration-slow: 600ms;
+
+  /* 弹性缓动：hover 抬起时轻微过冲，手感才"活" */
+  --glass-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --glass-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --glass-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* --- 交互位移 ----------------------------------------------------------- */
+  --glass-lift: 4px;
+  --glass-press: 1px;
+  --glass-press-scale: 0.97;
+
+  /* --- 微光扫过 (shimmer) -------------------------------------------------- */
+  --glass-shimmer-alpha: 0.14;
+  --glass-shimmer-angle: -20deg;
+  --glass-shimmer-duration: 900ms;
+
+  /* --- 圆角：五级 ---------------------------------------------------------- */
+  --glass-radius-sm: 10px;    /* 徽章内部、小控件 */
+  --glass-radius-md: 16px;    /* 骨架屏、次级容器 */
+  --glass-radius-card: 20px;  /* 卡片、菜单 */
+  --glass-radius-panel: 28px; /* 大面板、hero */
+  --glass-radius-pill: 999px; /* 按钮、输入框、标签 */
+
+  /* --- 由上面派生的可直接用的颜色 ------------------------------------------ */
+  --glass-bg: rgb(var(--glass-white) / var(--glass-fill));
+  --glass-bg-hover: rgb(var(--glass-white) / var(--glass-fill-hover));
+  --glass-border: rgb(var(--glass-white) / var(--glass-border-alpha));
+  --glass-border-hover: rgb(var(--glass-white) / var(--glass-border-alpha-hover));
+  --glass-specular-color: rgb(var(--glass-white) / var(--glass-specular));
+}

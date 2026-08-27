@@ -1,0 +1,145 @@
+/* ============================================================================
+ * @glasscn/core — 交互原语 (Interaction Primitives)
+ * ----------------------------------------------------------------------------
+ * 规范定的手感：
+ *   hover   translateY(-4px) + 投影变深 + 微光斜扫过表面
+ *   active  translateY(1px) scale(0.97)，80ms 内完成 —— 要"啪"地一下
+ *   focus   描边提亮到 0.30 + 外发光环 + 高光
+ *
+ * 只动 transform 和 opacity。绝不动 backdrop-filter、尺寸或布局属性 ——
+ * 那些每帧都要重新光栅化，一动就掉帧。
+ * ==========================================================================*/
+
+@utility glass-interactive {
+  transition-property: transform, box-shadow, background-color, border-color;
+  transition-duration: var(--glass-duration);
+  transition-timing-function: var(--glass-ease);
+  will-change: transform;
+
+  &:hover:not(:disabled, [data-disabled], [aria-disabled="true"]) {
+    transform: translateY(calc(var(--glass-lift) * -1));
+    background-color: rgb(var(--glass-white) / var(--glass-fill-hover));
+    border-color: var(--glass-border-hover);
+    box-shadow:
+      var(--glass-specular-size) var(--glass-specular-color) inset,
+      var(--glass-shadow-hover);
+  }
+
+  &:active:not(:disabled, [data-disabled], [aria-disabled="true"]) {
+    transform: translateY(var(--glass-press)) scale(var(--glass-press-scale));
+    transition-duration: var(--glass-duration-fast);
+  }
+
+  &:disabled,
+  &[data-disabled],
+  &[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: var(--glass-specular-size) var(--glass-specular-color) inset;
+  }
+}
+
+/* --- 微光扫过 (shimmer sweep) --------------------------------------------- */
+/* hover 时一道斜向白光扫过表面。这是"玻璃在光下被转动"的感觉，
+   也是这套设计里最有辨识度的一处动效。
+   用 ::after + overflow 裁切，不占 ::before（那个留给 premium 渐变边）。 */
+
+@keyframes glass-shimmer-sweep {
+  from {
+    transform: translateX(-130%) skewX(var(--glass-shimmer-angle));
+  }
+  to {
+    transform: translateX(230%) skewX(var(--glass-shimmer-angle));
+  }
+}
+
+@utility glass-shimmer {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(var(--glass-white) / var(--glass-shimmer-alpha)) 50%,
+      transparent 100%
+    );
+    transform: translateX(-130%) skewX(var(--glass-shimmer-angle));
+  }
+
+  &:hover::after {
+    opacity: 1;
+    animation: glass-shimmer-sweep var(--glass-shimmer-duration)
+      var(--glass-ease-out);
+  }
+}
+
+/* --- 聚焦环 --------------------------------------------------------------- */
+/* 背景是不可预测的光斑，单层 outline 经常和背景撞色。
+   三层：贴合棱边的亮线 + 强调色细环 + 扩散辉光。 */
+
+@utility glass-ring {
+  &:focus-visible {
+    outline: none;
+    border-color: rgb(var(--glass-white) / 0.3);
+    box-shadow:
+      var(--glass-specular-size) var(--glass-specular-color) inset,
+      0 0 0 1px rgb(var(--glass-white) / 0.3),
+      0 0 0 4px color-mix(in oklab, var(--glass-accent) 35%, transparent),
+      var(--glass-shadow);
+  }
+}
+
+/* --- 列表项高亮 ------------------------------------------------------------ */
+/* 菜单项、选项、命令项。不做位移也不做模糊 —— 一个列表里几十项，
+   每项都起合成层会直接掉帧。只换填充。 */
+
+@utility glass-highlight {
+  transition: background-color var(--glass-duration-fast) var(--glass-ease-out),
+    color var(--glass-duration-fast) var(--glass-ease-out);
+
+  &[data-highlighted],
+  &[data-state="checked"],
+  &:hover:not([data-disabled]) {
+    background-color: rgb(var(--glass-white) / 0.1);
+  }
+}
+
+/* --- 实心 CTA -------------------------------------------------------------- */
+/* 规范明确：主操作是实心强调色，不是玻璃。
+   主按钮做成玻璃会丢失可供性 —— 一屏全是半透明面板时，用户找不到"该点哪个"。 */
+
+@utility glass-cta {
+  background-color: var(--glass-accent);
+  color: var(--glass-accent-fg);
+  border: var(--glass-border-width) solid transparent;
+  border-radius: var(--glass-radius-pill);
+  box-shadow:
+    0 1px 0 0 rgb(var(--glass-white) / 0.25) inset,
+    0 8px 24px -8px color-mix(in oklab, var(--glass-accent) 60%, transparent);
+  transition-property: transform, filter, box-shadow;
+  transition-duration: var(--glass-duration);
+  transition-timing-function: var(--glass-ease);
+
+  &:hover:not(:disabled, [aria-disabled="true"]) {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow:
+      0 1px 0 0 rgb(var(--glass-white) / 0.3) inset,
+      0 14px 32px -10px color-mix(in oklab, var(--glass-accent) 70%, transparent);
+  }
+
+  &:active:not(:disabled, [aria-disabled="true"]) {
+    transform: translateY(1px) scale(var(--glass-press-scale));
+    transition-duration: var(--glass-duration-fast);
+  }
+}

@@ -1,0 +1,92 @@
+/* ============================================================================
+ * @glasscn/core — 揭示与加载态 (Reveal & Loading)
+ * ----------------------------------------------------------------------------
+ * 滚动揭示：卡片从下方 24px 处带着 8px 模糊浮入。
+ * 模糊一起动是关键 —— 单纯的位移淡入看着像贴纸滑进来，
+ * 带模糊才像"一块玻璃从景深里推到眼前"。
+ *
+ * 两种驱动方式：
+ *   1. 纯 CSS —— animation-timeline: view()，新浏览器原生支持，零 JS
+ *   2. JS —— IntersectionObserver 加 .is-revealed 类，
+ *      走 registry 的 use-glass-reveal hook，兼容老浏览器
+ * 两者共用同一套视觉，先声明纯 CSS，JS 那条作为渐进增强。
+ * ==========================================================================*/
+
+@utility glass-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(8px);
+  transition:
+    opacity var(--glass-duration-slow) var(--glass-ease),
+    transform var(--glass-duration-slow) var(--glass-ease),
+    filter calc(var(--glass-duration-slow) * 0.85) var(--glass-ease-out);
+
+  /* JS 驱动 */
+  &.is-revealed {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* 纯 CSS 驱动：支持滚动驱动动画的浏览器直接接管，不需要 JS。
+   放在 @supports 里，不支持的浏览器落到上面的 JS 路径。 */
+@supports (animation-timeline: view()) {
+  @keyframes glass-reveal-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+      filter: blur(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  .glass-reveal:not(.is-revealed) {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: glass-reveal-in linear both;
+    animation-timeline: view();
+    animation-range: entry 5% cover 22%;
+  }
+}
+
+/* 同级错峰：一排卡片依次浮入，而不是齐刷刷一起动 */
+@utility glass-reveal-stagger {
+  & > * {
+    transition-delay: 0ms;
+  }
+  & > *:nth-child(2) { transition-delay: 80ms; }
+  & > *:nth-child(3) { transition-delay: 160ms; }
+  & > *:nth-child(4) { transition-delay: 240ms; }
+  & > *:nth-child(5) { transition-delay: 320ms; }
+  & > *:nth-child(n + 6) { transition-delay: 400ms; }
+}
+
+/* --- 骨架屏 --------------------------------------------------------------- */
+/* 异步加载期间保持玻璃质感。用 background-position 扫而不是 transform，
+   这样不需要额外的裁切容器，也不会和 glass-shimmer 的 ::after 打架。 */
+
+@keyframes glass-skeleton-sweep {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@utility glass-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--glass-radius-md);
+  background-color: rgb(var(--glass-white) / var(--glass-fill-flat));
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgb(var(--glass-white) / 0.08) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: glass-skeleton-sweep 1.8s linear infinite;
+}

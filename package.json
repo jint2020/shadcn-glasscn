@@ -1,0 +1,18 @@
+{
+  "name": "glasscn-monorepo",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --filter @glasscn/playground dev",
+    "build": "pnpm --filter @glasscn/playground build",
+    "registry:build": "node packages/registry/build-registry.mjs && shadcn build --output apps/playground/public/r",
+    "verify": "pnpm build && node scripts/verify.mjs",
+    "screenshot": "pnpm build && node scripts/screenshot.mjs"
+  },
+  "devDependencies": {
+    "shadcn": "^4.19.0",
+    "playwright": "^1.57.0",
+    "pngjs": "^7.0.0"
+  }
+}

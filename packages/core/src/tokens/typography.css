@@ -1,0 +1,41 @@
+/* ============================================================================
+ * @glasscn/core — 字体 (Typography)
+ * ----------------------------------------------------------------------------
+ * 只定义 token，不加载字体。
+ *
+ * 这个库承诺零外部依赖，主题层里塞一个 Google Fonts 的 @import 会让每个
+ * 使用方都多一个跨域阻塞请求（国内网络尤其明显），而且没法退。
+ * 所以字体由消费方自己引，这里给出完整的 fallback 栈，
+ * 不引也不会崩，只是落到系统字体。
+ *
+ * 想要规范里的效果，在你自己的 HTML 里加：
+ *
+ *   <link rel="preconnect" href="https://fonts.googleapis.com">
+ *   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ *   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=DM+Sans:wght@400;500&display=swap">
+ *
+ * 自托管或用国内 CDN 时，把 font-family 的第一项换掉即可，别的不用动。
+ * ==========================================================================*/
+
+:root {
+  --glass-font-heading: "Outfit", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --glass-font-body: "DM Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  /* 标题：几何感、字距收紧、随视口流体缩放 */
+  --glass-tracking-heading: -0.02em;
+  --glass-text-h1: clamp(2.5rem, 5vw, 4.5rem);
+  --glass-text-h2: clamp(1.8rem, 3vw, 3rem);
+  --glass-text-h3: 1.5rem;
+
+  /* 正文：行高给足，玻璃上的长文本需要更多呼吸 */
+  --glass-leading-body: 1.75;
+}
+
+@theme inline {
+  --font-heading: var(--glass-font-heading);
+  --font-sans: var(--glass-font-body);
+  --text-display: var(--glass-text-h1);
+  --text-title: var(--glass-text-h2);
+}

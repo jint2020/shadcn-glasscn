@@ -1,0 +1,186 @@
+/* ============================================================================
+ * @glasscn/core — 表面原语 (Surface Primitives)
+ * ----------------------------------------------------------------------------
+ * 一块玻璃 = 四件事，缺一件就露馅：
+ *
+ *   1. backdrop-filter: blur() saturate()   折射背后的光斑
+ *   2. background: rgba(255,255,255,N)      白色中性填充，绝不带色
+ *   3. box-shadow inset 顶边 1px 高光        玻璃厚度接到顶光 —— 不可省
+ *   4. 1px 描边                             面板在背景上的可读边界 —— 不可省
+ *
+ * 第 3 条是"真玻璃"和"一块模糊的板子"之间唯一的区别。
+ * 第 4 条一去掉，面板边界会溶进背景，整个界面失去结构。
+ * ==========================================================================*/
+
+@utility glass-surface {
+  background-color: rgb(var(--glass-white) / var(--glass-fill-current));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: var(--glass-border-width) solid var(--glass-border);
+  box-shadow:
+    var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-underline),
+    var(--glass-shadow);
+  border-radius: var(--glass-radius-card);
+}
+
+/* --- 高度档位：只改变量 --------------------------------------------------- */
+
+@utility glass-flat {
+  --glass-blur: var(--glass-blur-flat);
+  --glass-fill-current: var(--glass-fill-flat);
+  --glass-shadow: var(--glass-shadow-flat);
+}
+
+@utility glass-raised {
+  --glass-blur: var(--glass-blur-raised);
+  --glass-fill-current: var(--glass-fill-raised);
+  --glass-shadow: var(--glass-shadow-raised);
+}
+
+@utility glass-overlay {
+  --glass-blur: var(--glass-blur-overlay);
+  --glass-fill-current: var(--glass-fill-overlay);
+  --glass-shadow: var(--glass-shadow-overlay);
+}
+
+@utility glass-modal {
+  --glass-blur: var(--glass-blur-modal);
+  --glass-fill-current: var(--glass-fill-modal);
+  --glass-shadow: var(--glass-shadow-modal);
+  --glass-saturate: var(--glass-saturate-modal);
+}
+
+/* --- 形状 ----------------------------------------------------------------- */
+
+@utility glass-panel {
+  border-radius: var(--glass-radius-panel);
+}
+
+@utility glass-pill {
+  border-radius: var(--glass-radius-pill);
+}
+
+/* --- 遮罩层 --------------------------------------------------------------- */
+
+@utility glass-scrim {
+  background-color: var(--glass-scrim);
+  -webkit-backdrop-filter: blur(var(--glass-scrim-blur)) saturate(140%);
+  backdrop-filter: blur(var(--glass-scrim-blur)) saturate(140%);
+}
+
+/* --- 导航：只有下边框，没有投影 ------------------------------------------- */
+/* 导航贴在视口顶部，投影会让它读作"浮在纸上的一条"，
+   而它应该是视口本身的一部分。 */
+
+@utility glass-nav {
+  background-color: rgb(var(--glass-white) / var(--glass-fill-nav));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
+  border: 0;
+  /* 描边和高光都比通用玻璃更收敛（0.08 / 0.06 对 0.12 / 0.20）——
+     导航横跨整个视口宽度，用通用强度会显得像一条亮带。 */
+  border-bottom: var(--glass-border-width) solid rgb(var(--glass-white) / 0.08);
+  border-radius: 0;
+  box-shadow: 0 1px 0 0 rgb(var(--glass-white) / 0.06) inset;
+}
+
+/* --- 菜单 / 上下文菜单 ----------------------------------------------------- */
+/* 规范单列的一档：blur 28 saturate 200%，填充 0.10、描边 0.14。
+   比 modal 稍薄但饱和更高 —— 菜单浮在内容正上方很近的距离，
+   太厚会让下面的内容彻底消失，失去空间关系。 */
+
+@utility glass-menu {
+  background-color: rgb(var(--glass-white) / 0.1);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  backdrop-filter: blur(28px) saturate(200%);
+  border: var(--glass-border-width) solid rgb(var(--glass-white) / 0.14);
+  border-radius: var(--glass-radius-card);
+  box-shadow:
+    0 1px 0 0 rgb(var(--glass-white) / 0.18) inset,
+    0 20px 60px rgb(0 0 0 / 0.4);
+  overflow: hidden;
+}
+
+/* --- 高级卡片：渐变描边 ---------------------------------------------------- */
+/* 光只打在左上角，向右下渐隐 —— 模拟单一光源打在一块有厚度的玻璃棱上。
+   用 mask 做描边而不是 border-image：border-image 不认 border-radius。 */
+
+@utility glass-premium {
+  position: relative;
+  border-color: transparent;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    padding: var(--glass-border-width);
+    pointer-events: none;
+    background: linear-gradient(
+      135deg,
+      rgb(var(--glass-white) / 0.45) 0%,
+      rgb(var(--glass-white) / 0.12) 32%,
+      rgb(var(--glass-white) / 0) 65%
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+  }
+}
+
+/* --- 局部覆写 ------------------------------------------------------------- */
+
+@utility glass-blur-* {
+  --glass-blur: --value([length], --blur- *);
+}
+
+@utility glass-fill-* {
+  /* glass-fill-12 → 填充不透明度 0.12 */
+  --glass-fill-current: calc(--value(integer) / 100);
+}
+
+/* --- 通透度：独立于调色的一条轴 -------------------------------------------- */
+/* <html data-glass-density="sheer"> 整站切换，或挂在任意子树上局部切换。
+   sheer 需要背景足够干净，否则文字会被背后的光斑洗掉；
+   heavy 可读性最好，数据密集界面用它。 */
+
+:root[data-glass-density="sheer"],
+[data-glass-density="sheer"] {
+  --glass-fill-flat: 0.03;
+  --glass-fill-raised: 0.05;
+  --glass-fill-overlay: 0.07;
+  --glass-fill-modal: 0.09;
+  --glass-blur-base: 24px;
+  --glass-saturate: 200%;
+  --glass-border-alpha: 0.08;
+}
+
+:root[data-glass-density="heavy"],
+[data-glass-density="heavy"] {
+  --glass-fill-flat: 0.16;
+  --glass-fill-raised: 0.2;
+  --glass-fill-overlay: 0.24;
+  --glass-fill-modal: 0.28;
+  --glass-blur-base: 14px;
+  --glass-saturate: 160%;
+  --glass-border-alpha: 0.2;
+}
+
+/* --- 嵌套保护 ------------------------------------------------------------- */
+/* 规范硬约束：模糊层最多叠三层。内层玻璃退回"薄玻璃"——
+   保留填充和棱边，去掉背景模糊。再模糊一次已经模糊过的结果，
+   画面会浑，边框也会叠成脏线。 */
+
+@utility glass-nested {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  --glass-fill-current: 0.05;
+  --glass-shadow: none;
+}

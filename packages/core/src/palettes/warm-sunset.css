@@ -1,0 +1,35 @@
+/* ============================================================================
+ * @glasscn/core/palettes/warm-sunset — Warm Sunset —— 红褐底 + 橙粉琥珀光斑。热烈，适合营销页与落地页
+ * ----------------------------------------------------------------------------
+ * 两种用法：
+ *   1. 静态套用 —— @import 本文件，全站生效
+ *   2. 运行时切换 —— <html data-glass-palette="warm-sunset">
+ *
+ * 玻璃填充在所有调色里都是白色中性，这里只换背景光斑、强调色和文字色调。
+ * ==========================================================================*/
+
+:root {
+  --glass-bg-base: #1a0a0a;
+  --glass-bg-mid: #2b1210;
+  --glass-blob-1: #f97316;
+  --glass-blob-2: #ec4899;
+  --glass-blob-3: #f59e0b;
+  --glass-accent: #fb923c;
+  --glass-accent-hover: #fdba74;
+  --glass-accent-fg: #1a0a06;
+  --glass-text-rgb: 255 245 237;
+  color-scheme: dark;
+}
+
+:root[data-glass-palette="warm-sunset"] {
+  --glass-bg-base: #1a0a0a;
+  --glass-bg-mid: #2b1210;
+  --glass-blob-1: #f97316;
+  --glass-blob-2: #ec4899;
+  --glass-blob-3: #f59e0b;
+  --glass-accent: #fb923c;
+  --glass-accent-hover: #fdba74;
+  --glass-accent-fg: #1a0a06;
+  --glass-text-rgb: 255 245 237;
+  color-scheme: dark;
+}

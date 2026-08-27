@@ -1,0 +1,52 @@
+/* ============================================================================
+ * @glasscn/core — 高度阶梯 (Elevation Scale)
+ * ----------------------------------------------------------------------------
+ * 设计说明给的是按组件点名的数值（导航 blur 24、上下文菜单 blur 28 saturate 200%）。
+ * 这里把那些点整理成一条连续的阶梯，组件只声明自己在哪一档。
+ *
+ *   flat    输入框 / 徽章 / 表格      blur 16  fill .06
+ *   raised  卡片 / 次级按钮 / 标签页  blur 20  fill .08   ← 规范里的"默认玻璃"
+ *   overlay 导航 / 浮层 / 侧边栏      blur 24  fill .10
+ *   modal   对话框 / 抽屉 / 命令面板   blur 28  fill .12  saturate 200%
+ *
+ * 规范另一条硬约束：模糊层最多叠三层。再多性能会塌，画面也会浑。
+ * 嵌套保护在 bridge/auto.css 里，内层玻璃自动退回无模糊的薄玻璃。
+ * ==========================================================================*/
+
+:root {
+  /* --- flat --------------------------------------------------------------- */
+  --glass-blur-flat: calc(var(--glass-blur-base) * 0.8);
+  --glass-fill-flat: 0.06;
+  --glass-shadow-flat: 0 2px 8px rgb(0 0 0 / 0.2);
+
+  /* --- raised ------------------------------------------------------------- */
+  --glass-blur-raised: var(--glass-blur-base);
+  --glass-fill-raised: var(--glass-fill);
+  --glass-shadow-raised: var(--glass-shadow-base);
+
+  /* --- overlay ------------------------------------------------------------ */
+  --glass-blur-overlay: calc(var(--glass-blur-base) * 1.2);
+  --glass-fill-overlay: 0.1;
+  --glass-shadow-overlay: 0 16px 48px rgb(0 0 0 / 0.42);
+
+  /* --- modal -------------------------------------------------------------- */
+  --glass-blur-modal: calc(var(--glass-blur-base) * 1.4);
+  --glass-fill-modal: 0.12;
+  --glass-saturate-modal: 200%;
+  --glass-shadow-modal: 0 24px 72px rgb(0 0 0 / 0.55);
+
+  /* --- 导航：规范里单列的一档 --------------------------------------------- */
+  /* 只有下边框、没有投影 —— 导航贴在视口顶部，投影会让它显得"浮在纸上"，
+     而它应该读作视口本身的一部分。 */
+  --glass-fill-nav: 0.06;
+  --glass-blur-nav: calc(var(--glass-blur-base) * 1.2);
+
+  /* --- 遮罩层 ------------------------------------------------------------- */
+  --glass-scrim: rgb(0 0 0 / 0.55);
+  --glass-scrim-blur: calc(var(--glass-blur-base) * 0.4);
+
+  /* 默认档位：raised。各组件在 auto 层里覆写成自己的档。 */
+  --glass-blur: var(--glass-blur-raised);
+  --glass-fill-current: var(--glass-fill-raised);
+  --glass-shadow: var(--glass-shadow-raised);
+}

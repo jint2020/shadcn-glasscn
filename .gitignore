@@ -1,0 +1,14 @@
+# 依赖
+node_modules/
+
+# 构建产物
+apps/playground/dist/
+# registry 的 shadcn build 产物：由 CI 现场生成，不入库
+apps/playground/public/r/
+
+# 系统 / 编辑器
+.DS_Store
+*.local
+
+# 本地 agent / 工具状态，不属于这个包
+.omc/

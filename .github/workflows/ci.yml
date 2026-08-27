@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # 构建 → 校验 registry → 浏览器断言 → 打 Pages 产物
+  build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: build-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm 版本由 package.json 的 packageManager 字段决定（当前钉的是 10.28.0）
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      # registry.json 从 CSS 反推生成，别手改；这一步顺带保证它和源码没漂移
+      - name: 生成 registry
+        run: pnpm registry:build
+
+      - name: 校验 registry 结构
+        run: node scripts/validate-registry.mjs
+
+      - name: 安装 Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # verify 内部会以 base "/" 重新构建 playground 再跑断言
+      - name: 浏览器断言
+        run: pnpm verify
+
+      # Pages 部署在 /shadcn-glasscn/ 子路径下，靠 BASE_PATH 切换
+      - name: 构建 Pages 产物
+        env:
+          BASE_PATH: /shadcn-glasscn/
+        run: pnpm build
+
+      - name: 上传 Pages 产物
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/playground/dist
+
+  # 只在 main 推送时部署，PR 不部署
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    # Pages 部署串行，跑到一半不要被取消
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

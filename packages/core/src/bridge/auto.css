@@ -1,0 +1,439 @@
+/* ============================================================================
+ * @glasscn/core — 零侵入自动层 (Auto Layer)
+ * ----------------------------------------------------------------------------
+ * shadcn 每个组件都会输出 data-slot 属性（<div data-slot="card">）。
+ * 挂在这些属性上，就能把已有项目里的 shadcn 组件就地变成玻璃：
+ * 一行组件源码不用改，也不用重新 shadcn add。
+ *
+ * 规则：
+ *   · 全部写在 @layer components 里 → Tailwind 工具类永远赢，用户可覆写
+ *   · 只补 shadcn 不设的属性：backdrop-filter、微光、药丸圆角
+ *   · 颜色 / 阴影 / 描边交给 tokens/bridge.css 的变量接管
+ *   · 主按钮排除在玻璃之外 —— 它是实心强调色
+ *   · 任意元素加 data-glass="off" 即可局部退出
+ * ==========================================================================*/
+
+@layer components {
+  /* --- 通用玻璃面 -------------------------------------------------------- */
+  /* 名单手工挑选，不用 [data-slot] 通配 —— 通配会让长列表里每个 cell
+     都起一个合成层。规范另一条硬约束：模糊层最多叠三层。 */
+
+  [data-slot="card"],
+  [data-slot="alert"],
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="drawer-content"],
+  [data-slot="popover-content"],
+  [data-slot="hover-card-content"],
+  [data-slot="tooltip-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="context-menu-content"],
+  [data-slot="menubar-content"],
+  [data-slot="select-content"],
+  [data-slot="select-trigger"],
+  [data-slot="command"],
+  [data-slot="navigation-menu-content"],
+  [data-slot="navigation-menu-viewport"],
+  [data-slot="sidebar"],
+  [data-slot="tabs-list"],
+  [data-slot="toggle-group"],
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="badge"],
+  [data-slot="toggle"],
+  [data-slot="accordion-item"],
+  [data-slot="table-container"],
+  [data-slot="pagination-link"],
+  [data-slot="avatar"] {
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    transition-property: transform, box-shadow, background-color, border-color;
+    transition-duration: var(--glass-duration);
+    transition-timing-function: var(--glass-ease);
+  }
+
+  /* 按钮单独一条：只有非实心变体才是玻璃。
+     主按钮和危险按钮是实心色块，加 backdrop-filter 会让色块透出背景，
+     直接毁掉可供性。 */
+  [data-slot="button"]:not([data-variant="default"], [data-variant="destructive"]) {
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  }
+
+  [data-slot="button"] {
+    transition-property: transform, box-shadow, background-color, border-color, filter;
+    transition-duration: var(--glass-duration);
+    transition-timing-function: var(--glass-ease);
+  }
+
+  /* --- 形状：接管 --radius，不写 border-radius 属性 ------------------------ */
+  /*
+   * 两条都要绕开：
+   *
+   * 1. 组件写的是 rounded-md / rounded-lg / rounded-xl，属于 @layer utilities。
+   *    在 @layer components 里写 border-radius 属性一定输 —— 这也正是这套
+   *    架构自己的规则：接管变量，不覆写属性。
+   *
+   * 2. shadcn 的 globals.css 用 @theme inline，Tailwind 会把量表**内联**掉：
+   *       .rounded-sm → calc(var(--radius) - 4px)
+   *       .rounded-md → calc(var(--radius) - 2px)
+   *       .rounded-lg → var(--radius)
+   *       .rounded-xl → calc(var(--radius) + 4px)
+   *    所以改 --radius-md 是没用的，要改的是 --radius 本身，
+   *    并且按该元素用的是哪一级把偏移量反解回去。
+   *
+   * 两个名字都设：非 inline 的 @theme 走 --radius-*，inline 的走 --radius。
+   */
+
+  /* 药丸 —— 用 rounded-md，所以 --radius 要比目标大 2px */
+  [data-slot="button"],
+  [data-slot="badge"],
+  [data-slot="input"],
+  [data-slot="select-trigger"],
+  [data-slot="toggle"],
+  [data-slot="pagination-link"],
+  [data-slot="tabs-trigger"] {
+    --radius: calc(var(--glass-radius-pill) + 2px);
+    --radius-md: var(--glass-radius-pill);
+  }
+
+  /* 药丸容器 —— 用 rounded-lg，偏移为 0 */
+  [data-slot="tabs-list"],
+  [data-slot="toggle-group"] {
+    --radius: var(--glass-radius-pill);
+    --radius-lg: var(--glass-radius-pill);
+  }
+
+  /* 多行输入不做药丸 —— 文本会贴着圆弧。用 rounded-md，给卡片圆角。 */
+  [data-slot="textarea"] {
+    --radius: calc(var(--glass-radius-card) + 2px);
+    --radius-md: var(--glass-radius-card);
+  }
+
+  /* 浮层与菜单 —— 用 rounded-md，给卡片圆角 */
+  [data-slot="popover-content"],
+  [data-slot="hover-card-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="context-menu-content"],
+  [data-slot="menubar-content"],
+  [data-slot="select-content"],
+  [data-slot="tooltip-content"] {
+    --radius: calc(var(--glass-radius-card) + 2px);
+    --radius-md: var(--glass-radius-card);
+  }
+
+  /* 大面板 —— 用 rounded-lg，给 28px */
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="drawer-content"],
+  [data-slot="command"] {
+    --radius: var(--glass-radius-panel);
+    --radius-lg: var(--glass-radius-panel);
+  }
+
+  /* 容器类 —— 用 rounded-lg，给卡片圆角 */
+  [data-slot="alert"],
+  [data-slot="accordion-item"],
+  [data-slot="table-container"] {
+    --radius: var(--glass-radius-card);
+    --radius-lg: var(--glass-radius-card);
+  }
+
+  /* 骨架屏 —— 用 rounded-md */
+  [data-slot="skeleton"] {
+    --radius: calc(var(--glass-radius-md) + 2px);
+    --radius-md: var(--glass-radius-md);
+  }
+
+  /* 列表项 —— 用 rounded-sm，偏移 -4px */
+  [data-slot="dropdown-menu-item"],
+  [data-slot="dropdown-menu-checkbox-item"],
+  [data-slot="dropdown-menu-radio-item"],
+  [data-slot="context-menu-item"],
+  [data-slot="menubar-item"],
+  [data-slot="select-item"],
+  [data-slot="command-item"] {
+    --radius: calc(var(--glass-radius-sm) + 4px);
+    --radius-sm: var(--glass-radius-sm);
+  }
+
+  /* --- 高度分档 ---------------------------------------------------------- */
+
+  /* flat —— 贴在背景上 */
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="select-trigger"],
+  [data-slot="badge"],
+  [data-slot="avatar"],
+  [data-slot="table-container"],
+  [data-slot="accordion-item"] {
+    --glass-blur: var(--glass-blur-flat);
+    --glass-fill-current: var(--glass-fill-flat);
+    --glass-shadow: var(--glass-shadow-flat);
+  }
+
+  /* raised —— 微微抬起 */
+  [data-slot="card"],
+  [data-slot="alert"],
+  [data-slot="button"],
+  [data-slot="toggle"],
+  [data-slot="toggle-group"],
+  [data-slot="tabs-list"],
+  [data-slot="pagination-link"] {
+    --glass-blur: var(--glass-blur-raised);
+    --glass-fill-current: var(--glass-fill-raised);
+    --glass-shadow: var(--glass-shadow-raised);
+  }
+
+  /* overlay —— 浮在内容之上 */
+  [data-slot="popover-content"],
+  [data-slot="hover-card-content"],
+  [data-slot="tooltip-content"],
+  [data-slot="navigation-menu-content"],
+  [data-slot="navigation-menu-viewport"],
+  [data-slot="sidebar"] {
+    --glass-blur: var(--glass-blur-overlay);
+    --glass-fill-current: var(--glass-fill-overlay);
+    --glass-shadow: var(--glass-shadow-overlay);
+  }
+
+  /* 菜单类单独一档：blur 28 saturate 200%，填充 .10、描边 .14。
+     比 modal 稍薄但饱和更高 —— 菜单浮在内容正上方很近的距离，
+     太厚会让下面的内容彻底消失，失去空间关系。 */
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="context-menu-content"],
+  [data-slot="menubar-content"],
+  [data-slot="select-content"] {
+    --glass-blur: 28px;
+    --glass-saturate: 200%;
+    --glass-fill-current: 0.1;
+    --glass-shadow: 0 20px 60px rgb(0 0 0 / 0.4);
+    --popover: rgb(var(--glass-white) / 0.1);
+    border-color: rgb(var(--glass-white) / 0.14);
+    box-shadow:
+      0 1px 0 0 rgb(var(--glass-white) / 0.18) inset,
+      var(--glass-shadow);
+    overflow: hidden;
+  }
+
+  /* modal —— 盖住全屏 */
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="drawer-content"],
+  [data-slot="command"] {
+    --glass-blur: var(--glass-blur-modal);
+    --glass-saturate: var(--glass-saturate-modal);
+    --glass-fill-current: var(--glass-fill-modal);
+    --glass-shadow: var(--glass-shadow-modal);
+
+    /* shadcn 的 DialogContent 写的是 bg-background，而 --background 必须
+       保持不透明（它是页面底）。在这一个元素上局部改写变量本身：
+       bg-background 就地解析成玻璃填充，用户写 className="bg-…" 依然生效。
+       两个名字都写：@theme inline 编成 var(--background)，
+       非 inline 的 @theme 编成 var(--color-background)。 */
+    --background: rgb(var(--glass-white) / var(--glass-fill-modal));
+    --color-background: var(--background);
+  }
+
+  /* --- 遮罩层：景深，不是色块 -------------------------------------------- */
+
+  [data-slot="dialog-overlay"],
+  [data-slot="sheet-overlay"],
+  [data-slot="drawer-overlay"],
+  [data-slot="alert-dialog-overlay"] {
+    background-color: var(--glass-scrim);
+    -webkit-backdrop-filter: blur(var(--glass-scrim-blur)) saturate(140%);
+    backdrop-filter: blur(var(--glass-scrim-blur)) saturate(140%);
+  }
+
+  /* --- 交互态 ------------------------------------------------------------ */
+
+  [data-slot="card"]:hover,
+  [data-slot="alert"]:hover {
+    background-color: rgb(var(--glass-white) / var(--glass-fill-hover));
+    border-color: var(--glass-border-hover);
+    transform: translateY(calc(var(--glass-lift) * -1));
+    box-shadow:
+      var(--glass-specular-size) var(--glass-specular-color) inset,
+      var(--glass-underline),
+      var(--glass-shadow-hover);
+  }
+
+  /* 玻璃按钮：抬 2px（不是卡片的 4px —— 按钮更小，4px 会显得跳） */
+  [data-slot="button"]:not([data-variant="default"], [data-variant="destructive"]):hover:not(
+      :disabled,
+      [aria-disabled="true"]
+    ),
+  [data-slot="toggle"]:hover:not(:disabled, [aria-disabled="true"]),
+  [data-slot="pagination-link"]:hover,
+  [data-slot="select-trigger"]:hover:not([data-disabled]) {
+    background-color: rgb(var(--glass-white) / var(--glass-fill-hover));
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+  }
+
+  /* 实心按钮：提亮而不是变透 */
+  [data-slot="button"][data-variant="default"]:hover:not(:disabled, [aria-disabled="true"]),
+  [data-slot="button"][data-variant="destructive"]:hover:not(:disabled, [aria-disabled="true"]) {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+  }
+
+  /* 禁用：实心按钮必须先褪成玻璃再降透明度。
+     只降 opacity 的话，0.45 的琥珀还是一块醒目的暖色块，
+     用户读作"可以点，只是颜色淡了些"—— 可供性没有真正撤销。 */
+  [data-slot="button"]:disabled,
+  [data-slot="button"][aria-disabled="true"] {
+    background-color: rgb(var(--glass-white) / 0.05) !important;
+    color: var(--glass-text-muted) !important;
+    border-color: rgb(var(--glass-white) / 0.08) !important;
+    box-shadow: none !important;
+    filter: none !important;
+    transform: none !important;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+
+  /* 按下：三态里的第三态，80ms 内完成 —— 要"啪"地一下，不能拖 */
+  [data-slot="button"]:active:not(:disabled, [aria-disabled="true"]),
+  [data-slot="toggle"]:active:not(:disabled, [aria-disabled="true"]) {
+    transform: translateY(var(--glass-press)) scale(var(--glass-press-scale));
+    transition-duration: var(--glass-duration-fast);
+  }
+
+  /* 输入聚焦：描边提亮 + 外环 + 高光 */
+  [data-slot="input"]:focus-visible,
+  [data-slot="textarea"]:focus-visible,
+  [data-slot="select-trigger"]:focus-visible {
+    background-color: rgb(var(--glass-white) / 0.1);
+    border-color: rgb(var(--glass-white) / 0.3);
+    box-shadow:
+      var(--glass-specular-size) var(--glass-specular-color) inset,
+      0 0 0 3px color-mix(in oklab, var(--glass-accent) 22%, transparent);
+  }
+
+  [data-slot="input"]::placeholder,
+  [data-slot="textarea"]::placeholder {
+    color: var(--glass-text-muted);
+  }
+
+  /* --- 菜单 / 列表项 ------------------------------------------------------ */
+  /* 不做位移也不做模糊：一个列表几十项，每项起合成层会直接掉帧。 */
+
+  [data-slot="dropdown-menu-item"],
+  [data-slot="dropdown-menu-checkbox-item"],
+  [data-slot="dropdown-menu-radio-item"],
+  [data-slot="context-menu-item"],
+  [data-slot="menubar-item"],
+  [data-slot="select-item"],
+  [data-slot="command-item"] {
+    transition: background-color var(--glass-duration-fast) var(--glass-ease-out);
+
+    &[data-highlighted],
+    &[data-state="checked"] {
+      background-color: rgb(var(--glass-white) / 0.1);
+    }
+  }
+
+  [data-slot="dropdown-menu-separator"],
+  [data-slot="context-menu-separator"],
+  [data-slot="menubar-separator"],
+  [data-slot="command-separator"],
+  [data-slot="separator"] {
+    background-color: rgb(var(--glass-white) / 0.1);
+  }
+
+  /* Tabs：选中项是浮在 list 玻璃之上的更亮的一块 */
+  [data-slot="tabs-trigger"] {
+    transition: background-color var(--glass-duration) var(--glass-ease-out),
+      box-shadow var(--glass-duration) var(--glass-ease-out);
+
+    &[data-state="active"] {
+      background-color: rgb(var(--glass-white) / 0.14);
+      box-shadow: 0 1px 0 0 var(--glass-specular-color) inset;
+    }
+  }
+
+  /* 开关 / 滑块：轨道是玻璃槽，滑块保持实心，靠对比建立可供性 */
+  [data-slot="switch"] {
+    -webkit-backdrop-filter: blur(var(--glass-blur-flat));
+    backdrop-filter: blur(var(--glass-blur-flat));
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3) inset;
+  }
+
+  [data-slot="switch-thumb"] {
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 0.4),
+      0 1px 0 0 rgb(var(--glass-white) / 0.5) inset;
+  }
+
+  [data-slot="slider-track"] {
+    -webkit-backdrop-filter: blur(var(--glass-blur-flat));
+    backdrop-filter: blur(var(--glass-blur-flat));
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3) inset;
+  }
+
+  [data-slot="slider-thumb"] {
+    box-shadow:
+      0 1px 4px 0 rgb(0 0 0 / 0.4),
+      0 1px 0 0 rgb(var(--glass-white) / 0.5) inset;
+    transition: transform var(--glass-duration-fast) var(--glass-ease);
+
+    &:hover { transform: scale(1.12); }
+    &:active { transform: scale(1.04); }
+  }
+
+  /* --- 骨架屏 ------------------------------------------------------------ */
+
+  [data-slot="skeleton"] {
+    animation: none;
+    background-color: rgb(var(--glass-white) / var(--glass-fill-flat));
+    background-image: linear-gradient(
+      100deg,
+      transparent 20%,
+      rgb(var(--glass-white) / 0.08) 50%,
+      transparent 80%
+    );
+    background-size: 200% 100%;
+    animation: glass-skeleton-sweep 1.8s linear infinite;
+  }
+
+  /* --- 表格 -------------------------------------------------------------- */
+  /* 行不加 backdrop-filter：一千行就是一千个合成层。 */
+
+  [data-slot="table-header"] {
+    background-color: rgb(var(--glass-white) / 0.05);
+  }
+
+  [data-slot="table-row"] {
+    border-bottom-color: rgb(var(--glass-white) / 0.08);
+
+    &:hover {
+      background-color: rgb(var(--glass-white) / 0.05);
+    }
+  }
+
+  /* --- 嵌套保护：最多三层模糊 -------------------------------------------- */
+
+  [data-slot="card"] [data-slot="card"],
+  [data-slot="dialog-content"] [data-slot="card"],
+  [data-slot="sheet-content"] [data-slot="card"],
+  [data-slot="popover-content"] [data-slot="card"],
+  [data-slot="card"] [data-slot="alert"] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    --glass-fill-current: 0.05;
+    --glass-shadow: none;
+  }
+
+  /* --- 局部退出 ---------------------------------------------------------- */
+
+  [data-glass="off"],
+  [data-glass="off"] * {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

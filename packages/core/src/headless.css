@@ -1,0 +1,17 @@
+/* ============================================================================
+ * @glasscn/core/headless — 只要工具类，不自动接管 shadcn
+ * ----------------------------------------------------------------------------
+ * 适用于：不想让 shadcn 组件被自动改写，只手动用 glass-* 工具类；
+ * 或者你的组件不是 shadcn（没有 data-slot）。
+ * ==========================================================================*/
+
+@import "./tokens/primitives.css";
+@import "./tokens/palette.css";
+@import "./tokens/elevation.css";
+@import "./tokens/typography.css";
+
+@import "./primitives/surface.css";
+@import "./primitives/interaction.css";
+@import "./primitives/backdrop.css";
+@import "./primitives/reveal.css";
+@import "./primitives/fallback.css";

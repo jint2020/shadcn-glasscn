@@ -1,0 +1,28 @@
+/* ============================================================================
+ * @glasscn/core — 完整入口
+ * ----------------------------------------------------------------------------
+ * 在你项目的 CSS 里，紧跟 shadcn 的变量之后引入：
+ *
+ *   @import "tailwindcss";
+ *   ... shadcn 的 :root / .dark 变量 ...
+ *   @import "@glasscn/core";                       ← 这一行
+ *   @import "@glasscn/core/palettes/switchable.css"; ← 想运行时切调色再加
+ *
+ * 顺序很重要：glasscn 要在 shadcn 变量之后，才能接管 --card / --popover 等。
+ *
+ * 字体不在这里加载，只定义 token —— 见 tokens/typography.css 顶部说明。
+ * ==========================================================================*/
+
+@import "./tokens/primitives.css";
+@import "./tokens/palette.css";
+@import "./tokens/elevation.css";
+@import "./tokens/typography.css";
+@import "./tokens/bridge.css";
+
+@import "./primitives/surface.css";
+@import "./primitives/interaction.css";
+@import "./primitives/backdrop.css";
+@import "./primitives/reveal.css";
+@import "./primitives/fallback.css";
+
+@import "./bridge/auto.css";
