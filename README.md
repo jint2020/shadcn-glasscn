@@ -45,8 +45,8 @@ shadcn/ui 的 Liquid Glass 主题层。暗色优先，纯 CSS，零运行时，�
 /* globals.css */
 @import "tailwindcss";
 /* ... 你原有的 shadcn 变量 ... */
-@import "@glasscn/core";                        /* ← 加这一行 */
-@import "@glasscn/core/palettes/switchable.css"; /* 想运行时切调色再加 */
+@import "glasscn-core";                        /* ← 加这一行 */
+@import "glasscn-core/palettes/switchable.css"; /* 想运行时切调色再加 */
 ```
 
 ```html
@@ -234,9 +234,9 @@ Tailwind v4 只输出实际用到的 `@utility`，工具类天然 tree-shake。
 CSS 层按目录粒度拆分：
 
 ```css
-@import "@glasscn/core/headless";              /* 只要工具类，不自动接管 */
-@import "@glasscn/core/tokens/primitives.css"; /* 只要材质变量 */
-@import "@glasscn/core/primitives/surface.css";
+@import "glasscn-core/headless";              /* 只要工具类，不自动接管 */
+@import "glasscn-core/tokens/primitives.css"; /* 只要材质变量 */
+@import "glasscn-core/primitives/surface.css";
 ```
 
 ---

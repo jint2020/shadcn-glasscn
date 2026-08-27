@@ -212,15 +212,22 @@ const HOMEPAGE = "https://jint2020.github.io/shadcn-glasscn"
 
 ### 发 npm 包
 
-`packages/core` 是纯 CSS，没有构建步骤，`files` 字段只发 `src`：
+`packages/core` 是纯 CSS，没有构建步骤，`files` 字段只发 `src`（npm 会另外自动带上
+`README.md` 和 `LICENSE`）。包名是无 scope 的 `glasscn-core`，所以不用建组织、
+也不用 `--access public`：
 
 ```bash
+npm login          # 首次发布前，交互式登录（要过 2FA）
 cd packages/core
-npm publish --access public
+npm publish        # 无 scope 公开包，默认就是 public
 ```
 
-发之前把 `package.json` 里的 `name`（现在是 `@glasscn/core`）
-换成你自己 npm scope 下的名字。
+之后每次发新版：改 `packages/core/package.json` 的 `version`（或 `npm version patch`），
+再 `npm publish`。改了 CSS 先 `pnpm registry:build`，让 registry 和 npm 两条渠道同步。
+
+想换成带 scope 的名字（个人 `@你的用户名/glasscn-core`，或自建组织后用 `@glasscn/core`），
+改 `packages/core/package.json` 的 `name`，同时同步 `apps/playground` 的依赖键和
+`src/styles/app.css` 里两行 `@import`，然后 `pnpm install` 重新链接。
 
 ---
 

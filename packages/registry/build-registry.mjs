@@ -1,5 +1,5 @@
 /**
- * 从 @glasscn/core 的 CSS 源文件生成 registry.json。
+ * 从 glasscn-core 的 CSS 源文件生成 registry.json。
  *
  * 手写 registry.json 的问题是它会和 CSS 源码悄悄漂移——
  * 改了 tokens 忘了同步 registry，用户 shadcn add 拿到的是旧值。

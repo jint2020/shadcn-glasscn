@@ -16,7 +16,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tailwind-merge": "^3.6.0",
-    "@glasscn/core": "workspace:*"
+    "glasscn-core": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
