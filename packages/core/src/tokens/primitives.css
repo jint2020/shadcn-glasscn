@@ -57,13 +57,24 @@
   --glass-shadow-hover: 0 20px 60px rgb(0 0 0 / 0.5);
 
   /* --- 运动 --------------------------------------------------------------- */
-  --glass-duration-fast: 80ms;      /* active 要"啪"地一下，不能拖 */
-  --glass-duration: 320ms;
-  --glass-duration-slow: 600ms;
+  /* 缓动哲学对齐 Apple（阻尼比 + 响应，见 WWDC「流体界面」）：
+     默认一切临界阻尼（阻尼比 1.0，无过冲）。悬停、入场、位移都不是
+     被甩出去的，不该弹；过冲只属于带着动量的手势（拨开关、倾斜回弹）。
+     旧版把过冲曲线用在所有 hover 上，手感是"弹跳的塑料"，已废弃。 */
+  --glass-duration-fast: 80ms;       /* active 要"啪"地一下，不能拖 */
+  --glass-duration: 240ms;           /* 位移/投影：等效响应 ~0.35s 的弹簧 */
+  --glass-duration-slow: 600ms;      /* 滚动揭示专用，只有它配用慢档 */
+  --glass-duration-color: 150ms;     /* 颜色反馈比位移快一拍 */
+  --glass-duration-enter: 240ms;     /* 浮层物化入场 */
+  --glass-duration-exit: 160ms;      /* 退场比入场快 -- 离开不该有仪式感 */
 
-  /* 弹性缓动：hover 抬起时轻微过冲，手感才"活" */
-  --glass-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --glass-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* 阻尼 1.0 · 响应 ~0.35s：transform 和投影的默认曲线 */
+  --glass-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* 攻击更快收尾干净：颜色和淡入淡出用它 */
+  --glass-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* 阻尼 ~0.8，轻微过冲。仅限动量交互（开关拨杆、倾斜回弹）--
+     出现在 hover 上就是误用，verify 里有断言盯着。 */
+  --glass-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --glass-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* --- 交互位移 ----------------------------------------------------------- */

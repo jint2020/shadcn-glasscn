@@ -49,8 +49,16 @@
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
     transition-property: transform, box-shadow, background-color, border-color;
-    transition-duration: var(--glass-duration);
-    transition-timing-function: var(--glass-ease);
+    transition-duration:
+      var(--glass-duration),
+      var(--glass-duration),
+      var(--glass-duration-color),
+      var(--glass-duration-color);
+    transition-timing-function:
+      var(--glass-ease),
+      var(--glass-ease),
+      var(--glass-ease-out),
+      var(--glass-ease-out);
   }
 
   /* 按钮单独一条：只有非实心变体才是玻璃。
@@ -63,8 +71,18 @@
 
   [data-slot="button"] {
     transition-property: transform, box-shadow, background-color, border-color, filter;
-    transition-duration: var(--glass-duration);
-    transition-timing-function: var(--glass-ease);
+    transition-duration:
+      var(--glass-duration),
+      var(--glass-duration),
+      var(--glass-duration-color),
+      var(--glass-duration-color),
+      var(--glass-duration-color);
+    transition-timing-function:
+      var(--glass-ease),
+      var(--glass-ease),
+      var(--glass-ease-out),
+      var(--glass-ease-out),
+      var(--glass-ease-out);
   }
 
   /* --- 形状：接管 --radius，不写 border-radius 属性 ------------------------ */
@@ -249,6 +267,128 @@
     backdrop-filter: blur(var(--glass-scrim-blur)) saturate(140%);
   }
 
+  /* --- 浮层物化（materialize）-------------------------------------------- */
+  /*
+   * 面板不能"啪"地出现 -- 那是直接操作感的反义词。三层动效：
+   *
+   *   遮罩    opacity 淡入 200ms，淡出更快 -- 「调暗以聚焦」
+   *   面板    scale 0.96->1 + 从触发方向 4px 位移，240ms，阻尼 1.0。
+   *           transform-origin 用 Radix 给的 --radix-*-transform-origin，
+   *           面板从触发它的按钮那一侧长出来 -- 空间关系一目了然
+   *   退场    沿入场同一路径反向走，160ms（快于入场 --
+   *           离开不需要仪式感），这是「对称路径」原则
+   *
+   * 为什么用 @keyframes 而不是 transition：Radix 的 Presence
+   * 靠 animationName 判断"退出动画是否在途"来延迟卸载 --
+   * transition 不触发 animationend，退出动画会被瞬间卸载吞掉。
+   * keyframes 也天然可中断：重新打开时新动画从头播，没有终态残留。
+   */
+
+  [data-slot="dialog-overlay"],
+  [data-slot="sheet-overlay"],
+  [data-slot="drawer-overlay"],
+  [data-slot="alert-dialog-overlay"] {
+    animation: glass-fade-in var(--glass-duration-enter) var(--glass-ease-out);
+  }
+  [data-slot="dialog-overlay"][data-state="closed"],
+  [data-slot="sheet-overlay"][data-state="closed"],
+  [data-slot="drawer-overlay"][data-state="closed"],
+  [data-slot="alert-dialog-overlay"][data-state="closed"] {
+    animation: glass-fade-out var(--glass-duration-exit) var(--glass-ease-out);
+  }
+
+  /* modal：居中物化。scale 起点比浮层更低 -- 更"厚"的东西动得更重。
+     基准 translate(-50%,-50%) 是 shadcn Dialog 的居中手段，keyframes
+     里必须带上，否则第一帧跳位。 */
+  [data-slot="dialog-content"],
+  [data-slot="command"] {
+    animation: glass-modal-in var(--glass-duration-enter) var(--glass-ease);
+  }
+  [data-slot="dialog-content"][data-state="closed"],
+  [data-slot="command"][data-state="closed"] {
+    animation: glass-modal-out var(--glass-duration-exit) var(--glass-ease);
+  }
+
+  /* Sheet / Drawer：从边缘滑入，data-side 决定方向 --
+     从哪来回哪去，对称路径。 */
+  [data-slot="sheet-content"],
+  [data-slot="drawer-content"] {
+    animation: glass-sheet-in-bottom var(--glass-duration-enter) var(--glass-ease);
+  }
+  [data-slot="sheet-content"][data-state="closed"],
+  [data-slot="drawer-content"][data-state="closed"] {
+    animation: glass-sheet-out-bottom var(--glass-duration-exit) var(--glass-ease);
+  }
+  [data-slot="sheet-content"][data-side="top"],
+  [data-slot="drawer-content"][data-side="top"] {
+    animation-name: glass-sheet-in-top;
+  }
+  [data-slot="sheet-content"][data-side="top"][data-state="closed"],
+  [data-slot="drawer-content"][data-side="top"][data-state="closed"] {
+    animation-name: glass-sheet-out-top;
+  }
+  [data-slot="sheet-content"][data-side="left"],
+  [data-slot="drawer-content"][data-side="left"] {
+    animation-name: glass-sheet-in-left;
+  }
+  [data-slot="sheet-content"][data-side="left"][data-state="closed"],
+  [data-slot="drawer-content"][data-side="left"][data-state="closed"] {
+    animation-name: glass-sheet-out-left;
+  }
+  [data-slot="sheet-content"][data-side="right"],
+  [data-slot="drawer-content"][data-side="right"] {
+    animation-name: glass-sheet-in-right;
+  }
+  [data-slot="sheet-content"][data-side="right"][data-state="closed"],
+  [data-slot="drawer-content"][data-side="right"][data-state="closed"] {
+    animation-name: glass-sheet-out-right;
+  }
+
+  /* 锚定浮层（popover / 菜单 / select）：从触发方向长出来。
+     4px 朝 origin 的反方向收拢 -- origin 在顶（内容在按钮下方）时
+     面板从下方 4px 处上浮到位。 */
+  [data-slot="popover-content"],
+  [data-slot="hover-card-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="context-menu-content"],
+  [data-slot="menubar-content"],
+  [data-slot="select-content"] {
+    animation: glass-pop-in var(--glass-duration-enter) var(--glass-ease);
+  }
+  [data-slot="popover-content"][data-state="closed"],
+  [data-slot="hover-card-content"][data-state="closed"],
+  [data-slot="dropdown-menu-content"][data-state="closed"],
+  [data-slot="dropdown-menu-sub-content"][data-state="closed"],
+  [data-slot="context-menu-content"][data-state="closed"],
+  [data-slot="menubar-content"][data-state="closed"],
+  [data-slot="select-content"][data-state="closed"] {
+    animation: glass-pop-out var(--glass-duration-exit) var(--glass-ease);
+  }
+
+  /* tooltip：更快更轻，它是瞬时反馈不是面板 */
+  [data-slot="tooltip-content"] {
+    animation: glass-tip-in 120ms var(--glass-ease);
+  }
+  [data-slot="tooltip-content"][data-state="closed"] {
+    animation: glass-tip-out 100ms var(--glass-ease-out);
+  }
+
+  /* 手风琴：内容沿纵轴展开。grid-template-rows 0fr->1fr 过渡，
+     比 max-height hack 干净（不需要猜上界）。
+     keyframes 里的 0fr/1fr 关键帧在支持 grid 过渡的浏览器上平滑，
+     不支持的退成两帧切换 -- 仍然可见、仍然对称。 */
+  [data-slot="accordion-content"] {
+    overflow: hidden;
+    animation: none;
+  }
+  [data-slot="accordion-content"][data-state="open"] {
+    animation: glass-accordion-in var(--glass-duration) var(--glass-ease);
+  }
+  [data-slot="accordion-content"][data-state="closed"] {
+    animation: glass-accordion-out var(--glass-duration-exit) var(--glass-ease);
+  }
+
   /* --- 交互态 ------------------------------------------------------------ */
 
   [data-slot="card"]:hover,
@@ -348,8 +488,8 @@
 
   /* Tabs：选中项是浮在 list 玻璃之上的更亮的一块 */
   [data-slot="tabs-trigger"] {
-    transition: background-color var(--glass-duration) var(--glass-ease-out),
-      box-shadow var(--glass-duration) var(--glass-ease-out);
+    transition: background-color var(--glass-duration-color) var(--glass-ease-out),
+      box-shadow var(--glass-duration) var(--glass-ease);
 
     &[data-state="active"] {
       background-color: rgb(var(--glass-white) / 0.14);
@@ -364,10 +504,16 @@
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3) inset;
   }
 
+  /* 拨杆是这套体系里唯一的动量交互 -- 手指把它拨出去，它会带着
+     惯性冲过头再回来。所以唯独这里用过冲曲线（阻尼 ~0.8），
+     hover/入场都不许用，只有"被甩出去的东西"才配弹。 */
   [data-slot="switch-thumb"] {
     box-shadow:
       0 1px 3px 0 rgb(0 0 0 / 0.4),
       0 1px 0 0 rgb(var(--glass-white) / 0.5) inset;
+    transition:
+      transform var(--glass-duration) var(--glass-ease-spring),
+      background-color var(--glass-duration-color) var(--glass-ease-out);
   }
 
   [data-slot="slider-track"] {
@@ -380,10 +526,14 @@
     box-shadow:
       0 1px 4px 0 rgb(0 0 0 / 0.4),
       0 1px 0 0 rgb(var(--glass-white) / 0.5) inset;
-    transition: transform var(--glass-duration-fast) var(--glass-ease);
+    /* hover 的放大是跟随意图，阻尼 1.0；按压要"啪"，80ms */
+    transition: transform var(--glass-duration) var(--glass-ease);
 
     &:hover { transform: scale(1.12); }
-    &:active { transform: scale(1.04); }
+    &:active {
+      transform: scale(1.04);
+      transition-duration: var(--glass-duration-fast);
+    }
   }
 
   /* --- 骨架屏 ------------------------------------------------------------ */

@@ -39,6 +39,12 @@ const open = async (opts = {}) => {
 /** 解析 rgb()/rgba() 成 [r,g,b,a] */
 const RGB = `(s) => { const m = s.match(/[\\d.]+/g); return m ? m.map(Number) : null }`
 
+/** CSS 时间字符串 -> 毫秒（"240ms" / ".24s" 两种形态都认） */
+const ms = (s) => {
+  const v = parseFloat(s)
+  return s?.trim().endsWith("s") && !s.trim().endsWith("ms") ? v * 1000 : v
+}
+
 /* ===== 1. 核心规则：玻璃填充必须是白色中性 ===== */
 {
   const page = await open()
@@ -184,6 +190,50 @@ const RGB = `(s) => { const m = s.match(/[\\d.]+/g); return m ? m.map(Number) : 
     return el ? getComputedStyle(el).backdropFilter : "NOT_FOUND"
   })()`)
   check("嵌套保护：内层卡片不再二次模糊", nested === "none", nested)
+  await page.context().close()
+}
+
+/* ===== 5.5 缓动纪律与浮层物化 ===== */
+/* Apple「流体界面」：默认 UI 阻尼 1.0 不过冲，bounce 只属于动量交互。
+   过冲曲线（1.56）曾整站当 house easing 用，这里守住不让它回来。 */
+{
+  const page = await open()
+  const motion = await page.evaluate(`(() => {
+    const root = getComputedStyle(document.documentElement)
+    const card = document.querySelector('[data-slot="card"]')
+    return {
+      ease: root.getPropertyValue("--glass-ease").trim(),
+      spring: root.getPropertyValue("--glass-ease-spring").trim(),
+      duration: root.getPropertyValue("--glass-duration").trim(),
+      color: root.getPropertyValue("--glass-duration-color").trim(),
+      cardTransition: getComputedStyle(card).transitionTimingFunction,
+    }
+  })()`)
+  check("house easing 是阻尼 1.0（无过冲 1.56）",
+        !motion.ease.includes("1.56"), motion.ease)
+  check("过冲曲线只挂在 --glass-ease-spring（动量专用）",
+        motion.spring.includes("1.56"), motion.spring)
+  check("位移 240ms / 颜色 150ms，颜色快一拍",
+        ms(motion.duration) === 240 && ms(motion.color) === 150,
+        `${motion.duration} / ${motion.color}`)
+  check("卡片过渡没有过冲曲线",
+        !motion.cardTransition.includes("1.56"), motion.cardTransition.slice(0, 40))
+
+  /* 浮层物化：改为 keyframes（Radix Presence 只认 animationName，
+     transition 版退场会被瞬间卸载）。验证方式：open 态必须挂着
+     glass-pop-in 这条动画 -- 挂不上说明物化层丢了 */
+  const menuAnim = await page.evaluate(`(() => {
+    const probe = document.createElement("div")
+    probe.setAttribute("data-slot", "popover-content")
+    probe.dataset.state = "open"
+    probe.style.display = "none"
+    document.body.appendChild(probe)
+    const name = getComputedStyle(probe).animationName
+    probe.remove()
+    return name
+  })()`)
+  check("浮层物化入场动画挂载（glass-pop-in）",
+        menuAnim === "glass-pop-in", menuAnim)
   await page.context().close()
 }
 

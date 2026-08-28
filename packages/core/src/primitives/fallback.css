@@ -87,13 +87,40 @@
 }
 
 /* --- 4. 减少动效 ----------------------------------------------------------- */
-/* 技能要求的兜底：所有动画与过渡压到近零，揭示元素立即可见。 */
+/* 技能要求的兜底：所有动画与过渡压到近零，揭示元素立即可见。
+   浮层物化的位移/缩放在此一并归零 -- 减少动效不是没有反馈，
+   面板仍然淡入淡出（opacity 是前庭安全的），只是不再移动。 */
 
 @media (prefers-reduced-motion: reduce) {
+  /* 注意只能对锚定浮层整体归零。居中 modal 的 translate(-50%,-50%)
+     同时承担着定位（shadcn 的 Dialog 靠它居中），整条 transform: none
+     会让面板跳去左上角。对它们只关位移和缩放，保留居中。 */
+  [data-slot="popover-content"],
+  [data-slot="hover-card-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="context-menu-content"],
+  [data-slot="menubar-content"],
+  [data-slot="select-content"],
+  [data-slot="tooltip-content"],
+  [data-slot="sheet-content"],
+  [data-slot="drawer-content"] {
+    transform: none !important;
+  }
+
+  [data-slot="dialog-content"],
+  [data-slot="command"] {
+    transform: translate(-50%, -50%) !important;
+  }
+
   :root {
     --glass-duration-fast: 0.01ms !important;
     --glass-duration: 0.01ms !important;
     --glass-duration-slow: 0.01ms !important;
+    --glass-duration-color: 0.01ms !important;
+    --glass-duration-enter: 0.01ms !important;
+    --glass-duration-exit: 0.01ms !important;
+    --glass-shimmer-duration: 0.01ms !important;
     --glass-lift: 0px !important;
     --glass-press: 0px !important;
     --glass-press-scale: 1 !important;

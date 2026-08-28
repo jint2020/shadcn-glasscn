@@ -8,12 +8,26 @@
  *
  * 只动 transform 和 opacity。绝不动 backdrop-filter、尺寸或布局属性 ——
  * 那些每帧都要重新光栅化，一动就掉帧。
+ *
+ * 缓动纪律（对齐 Apple「流体界面」的阻尼比 + 响应）：
+ *   位移 / 投影   阻尼 1.0，240ms -- 悬停不是被甩出去的，不过冲
+ *   颜色反馈      150ms，快一拍 -- 状态确认不需要仪式感
+ *   按压          80ms -- 要"啪"地一下
+ * 过冲曲线（--glass-ease-spring）只保留给带动量的交互：开关拨杆、倾斜回弹。
  * ==========================================================================*/
 
 @utility glass-interactive {
   transition-property: transform, box-shadow, background-color, border-color;
-  transition-duration: var(--glass-duration);
-  transition-timing-function: var(--glass-ease);
+  transition-duration:
+    var(--glass-duration),
+    var(--glass-duration),
+    var(--glass-duration-color),
+    var(--glass-duration-color);
+  transition-timing-function:
+    var(--glass-ease),
+    var(--glass-ease),
+    var(--glass-ease-out),
+    var(--glass-ease-out);
   will-change: transform;
 
   &:hover:not(:disabled, [data-disabled], [aria-disabled="true"]) {
@@ -127,8 +141,8 @@
     0 1px 0 0 rgb(var(--glass-white) / 0.25) inset,
     0 8px 24px -8px color-mix(in oklab, var(--glass-accent) 60%, transparent);
   transition-property: transform, filter, box-shadow;
-  transition-duration: var(--glass-duration);
-  transition-timing-function: var(--glass-ease);
+  transition-duration: var(--glass-duration), var(--glass-duration-color), var(--glass-duration);
+  transition-timing-function: var(--glass-ease), var(--glass-ease-out), var(--glass-ease);
 
   &:hover:not(:disabled, [aria-disabled="true"]) {
     transform: translateY(-2px);

@@ -74,6 +74,7 @@
   h1, h2, h3 {
     font-family: var(--glass-font-heading);
     letter-spacing: var(--glass-tracking-heading);
+    line-height: var(--glass-leading-heading);
     color: var(--glass-text-primary);
   }
 

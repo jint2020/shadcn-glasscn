@@ -67,6 +67,82 @@
   & > *:nth-child(n + 6) { transition-delay: 400ms; }
 }
 
+/* --- 浮层物化 keyframes ---------------------------------------------------- */
+/* 给 bridge/auto.css 用。设计原则见 auto.css 里的注释块；
+   定义放这里是因为 registry 的 css 字段按文件收集 @keyframes，
+   集中放一处，生成器不会漏。 */
+
+/* 遮罩：纯淡入淡出 -- 它是氛围不是面板 */
+@keyframes glass-fade-in {
+  from { opacity: 0; }
+}
+@keyframes glass-fade-out {
+  to { opacity: 0; }
+}
+
+/* 居中 modal：scale 0.96->1，位移只动 2%（y 轴微抬）。
+   基准 translate(-50%,-50%) 是 shadcn Dialog 的居中手段，必须带上。 */
+@keyframes glass-modal-in {
+  from { opacity: 0; transform: translate(-50%, -52%) scale(0.96); }
+}
+@keyframes glass-modal-out {
+  to { opacity: 0; transform: translate(-50%, -52%) scale(0.96); }
+}
+
+/* 锚定浮层：从触发方向 4px + scale 0.98 物化。
+   transform-origin 由 Radix 的 --radix-*-transform-origin 给出，
+   面板从触发按钮那一侧长出来。 */
+@keyframes glass-pop-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+@keyframes glass-pop-out {
+  to { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+
+/* tooltip：更快更轻 */
+@keyframes glass-tip-in {
+  from { opacity: 0; transform: translateY(2px) scale(0.97); }
+}
+@keyframes glass-tip-out {
+  to { opacity: 0; transform: translateY(2px) scale(0.97); }
+}
+
+/* Sheet / Drawer：沿各自方向滑入，对称滑出（从哪来回哪去）。
+   16px 起步 -- 比 modal 的 scale 更"整块"，抽屉是刚性平移不是膨胀。 */
+@keyframes glass-sheet-in-bottom {
+  from { opacity: 0; transform: translateY(16px); }
+}
+@keyframes glass-sheet-out-bottom {
+  to { opacity: 0; transform: translateY(16px); }
+}
+@keyframes glass-sheet-in-top {
+  from { opacity: 0; transform: translateY(-16px); }
+}
+@keyframes glass-sheet-out-top {
+  to { opacity: 0; transform: translateY(-16px); }
+}
+@keyframes glass-sheet-in-left {
+  from { opacity: 0; transform: translateX(-16px); }
+}
+@keyframes glass-sheet-out-left {
+  to { opacity: 0; transform: translateX(-16px); }
+}
+@keyframes glass-sheet-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+}
+@keyframes glass-sheet-out-right {
+  to { opacity: 0; transform: translateX(16px); }
+}
+
+/* 手风琴：高度沿 grid-template-rows 0fr->1fr 展开。
+   不支持 grid rows 插值的浏览器退成两帧 -- 仍然可见，无断裂。 */
+@keyframes glass-accordion-in {
+  from { grid-template-rows: 0fr; opacity: 0.4; }
+}
+@keyframes glass-accordion-out {
+  to { grid-template-rows: 0fr; opacity: 0.4; }
+}
+
 /* --- 骨架屏 --------------------------------------------------------------- */
 /* 异步加载期间保持玻璃质感。用 background-position 扫而不是 transform，
    这样不需要额外的裁切容器，也不会和 glass-shimmer 的 ::after 打架。 */

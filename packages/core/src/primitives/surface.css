@@ -85,6 +85,32 @@
   box-shadow: 0 1px 0 0 rgb(var(--glass-white) / 0.06) inset;
 }
 
+/* --- 滚动边缘效果：内容掠过导航下缘时渐现 --------------------------------- */
+/* Apple 材质规范：悬浮 chrome 和内容的交界不用常驻硬分隔线，
+   而是内容真正滚过导航下缘时，一道阴影从无到有渐现 --
+   「滚动边缘效果，不是硬分隔线」。静止在顶部时值为 0，天然干净。
+   scroll(root y) 时间轴驱动，0..80px 滚动距离映射整段渐现；
+   不支持 scroll-driven animation 的浏览器整块 @supports 忽略，
+   退回上面的静态 hairline，行为无回退悬崖。 */
+
+@supports (animation-timeline: scroll()) {
+  .glass-nav {
+    animation: glass-nav-edge linear both;
+    animation-timeline: scroll(root y);
+    animation-range: 0 80px;
+  }
+
+  @keyframes glass-nav-edge {
+    from { box-shadow: 0 1px 0 0 rgb(var(--glass-white) / 0.06) inset; }
+    to {
+      box-shadow:
+        0 1px 0 0 rgb(var(--glass-white) / 0.06) inset,
+        0 8px 16px -12px rgb(0 0 0 / 0.55),
+        0 1px 0 0 rgb(0 0 0 / 0.35);
+    }
+  }
+}
+
 /* --- 菜单 / 上下文菜单 ----------------------------------------------------- */
 /* 规范单列的一档：blur 28 saturate 200%，填充 0.10、描边 0.14。
    比 modal 稍薄但饱和更高 —— 菜单浮在内容正上方很近的距离，

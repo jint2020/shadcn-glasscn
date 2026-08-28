@@ -48,7 +48,7 @@ pnpm install
 pnpm exec playwright install chromium   # 验证脚本要用，只需装一次
 
 pnpm registry:build   # 生成 registry 产物
-pnpm verify           # 32 项浏览器断言
+pnpm verify           # 37 项浏览器断言
 pnpm dev              # 起预览站，浏览器打开看一眼
 ```
 

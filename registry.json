@@ -21,6 +21,8 @@
           "blur-glass-overlay": "var(--glass-blur-overlay)",
           "blur-glass-modal": "var(--glass-blur-modal)",
           "ease-glass": "var(--glass-ease)",
+          "ease-glass-out": "var(--glass-ease-out)",
+          "ease-glass-spring": "var(--glass-ease-spring)",
           "radius-pill": "var(--glass-radius-pill)",
           "color-glass-accent": "var(--glass-accent)"
         },
@@ -40,10 +42,14 @@
           "glass-shadow-base": "0 12px 40px rgb(0 0 0 / 0.35)",
           "glass-shadow-hover": "0 20px 60px rgb(0 0 0 / 0.5)",
           "glass-duration-fast": "80ms",
-          "glass-duration": "320ms",
+          "glass-duration": "240ms",
           "glass-duration-slow": "600ms",
-          "glass-ease": "cubic-bezier(0.34, 1.56, 0.64, 1)",
-          "glass-ease-out": "cubic-bezier(0.22, 1, 0.36, 1)",
+          "glass-duration-color": "150ms",
+          "glass-duration-enter": "240ms",
+          "glass-duration-exit": "160ms",
+          "glass-ease": "cubic-bezier(0.22, 1, 0.36, 1)",
+          "glass-ease-out": "cubic-bezier(0.16, 1, 0.3, 1)",
+          "glass-ease-spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
           "glass-ease-in-out": "cubic-bezier(0.65, 0, 0.35, 1)",
           "glass-lift": "4px",
           "glass-press": "1px",
@@ -98,9 +104,11 @@
           "glass-font-heading": "\"Outfit\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
           "glass-font-body": "\"DM Sans\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
           "glass-tracking-heading": "-0.02em",
+          "glass-tracking-caps": "0.14em",
           "glass-text-h1": "clamp(2.5rem, 5vw, 4.5rem)",
           "glass-text-h2": "clamp(1.8rem, 3vw, 3rem)",
           "glass-text-h3": "1.5rem",
+          "glass-leading-heading": "1.1",
           "glass-leading-body": "1.75",
           "background": "var(--glass-bg-base)",
           "foreground": "var(--glass-text-primary)",
@@ -223,8 +231,8 @@
         },
         "@utility glass-interactive": {
           "transition-property": "transform, box-shadow, background-color, border-color",
-          "transition-duration": "var(--glass-duration)",
-          "transition-timing-function": "var(--glass-ease)",
+          "transition-duration": "var(--glass-duration), var(--glass-duration), var(--glass-duration-color), var(--glass-duration-color)",
+          "transition-timing-function": "var(--glass-ease), var(--glass-ease), var(--glass-ease-out), var(--glass-ease-out)",
           "will-change": "transform",
           "&:hover:not(:disabled, [data-disabled], [aria-disabled=\"true\"])": {
             "transform": "translateY(calc(var(--glass-lift) * -1))",
@@ -291,8 +299,8 @@
           "border-radius": "var(--glass-radius-pill)",
           "box-shadow": "0 1px 0 0 rgb(var(--glass-white) / 0.25) inset, 0 8px 24px -8px color-mix(in oklab, var(--glass-accent) 60%, transparent)",
           "transition-property": "transform, filter, box-shadow",
-          "transition-duration": "var(--glass-duration)",
-          "transition-timing-function": "var(--glass-ease)",
+          "transition-duration": "var(--glass-duration), var(--glass-duration-color), var(--glass-duration)",
+          "transition-timing-function": "var(--glass-ease), var(--glass-ease-out), var(--glass-ease)",
           "&:hover:not(:disabled, [aria-disabled=\"true\"])": {
             "transform": "translateY(-2px)",
             "filter": "brightness(1.1)",
@@ -401,6 +409,112 @@
             "transition-delay": "400ms"
           }
         },
+        "@keyframes glass-fade-in": {
+          "from": {
+            "opacity": "0"
+          }
+        },
+        "@keyframes glass-fade-out": {
+          "to": {
+            "opacity": "0"
+          }
+        },
+        "@keyframes glass-modal-in": {
+          "from": {
+            "opacity": "0",
+            "transform": "translate(-50%, -52%) scale(0.96)"
+          }
+        },
+        "@keyframes glass-modal-out": {
+          "to": {
+            "opacity": "0",
+            "transform": "translate(-50%, -52%) scale(0.96)"
+          }
+        },
+        "@keyframes glass-pop-in": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(4px) scale(0.98)"
+          }
+        },
+        "@keyframes glass-pop-out": {
+          "to": {
+            "opacity": "0",
+            "transform": "translateY(4px) scale(0.98)"
+          }
+        },
+        "@keyframes glass-tip-in": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(2px) scale(0.97)"
+          }
+        },
+        "@keyframes glass-tip-out": {
+          "to": {
+            "opacity": "0",
+            "transform": "translateY(2px) scale(0.97)"
+          }
+        },
+        "@keyframes glass-sheet-in-bottom": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(16px)"
+          }
+        },
+        "@keyframes glass-sheet-out-bottom": {
+          "to": {
+            "opacity": "0",
+            "transform": "translateY(16px)"
+          }
+        },
+        "@keyframes glass-sheet-in-top": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(-16px)"
+          }
+        },
+        "@keyframes glass-sheet-out-top": {
+          "to": {
+            "opacity": "0",
+            "transform": "translateY(-16px)"
+          }
+        },
+        "@keyframes glass-sheet-in-left": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateX(-16px)"
+          }
+        },
+        "@keyframes glass-sheet-out-left": {
+          "to": {
+            "opacity": "0",
+            "transform": "translateX(-16px)"
+          }
+        },
+        "@keyframes glass-sheet-in-right": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateX(16px)"
+          }
+        },
+        "@keyframes glass-sheet-out-right": {
+          "to": {
+            "opacity": "0",
+            "transform": "translateX(16px)"
+          }
+        },
+        "@keyframes glass-accordion-in": {
+          "from": {
+            "grid-template-rows": "0fr",
+            "opacity": "0.4"
+          }
+        },
+        "@keyframes glass-accordion-out": {
+          "to": {
+            "grid-template-rows": "0fr",
+            "opacity": "0.4"
+          }
+        },
         "@keyframes glass-skeleton-sweep": {
           "from": {
             "background-position": "200% 0"
@@ -423,8 +537,8 @@
             "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
             "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
             "transition-property": "transform, box-shadow, background-color, border-color",
-            "transition-duration": "var(--glass-duration)",
-            "transition-timing-function": "var(--glass-ease)"
+            "transition-duration": "var(--glass-duration), var(--glass-duration), var(--glass-duration-color), var(--glass-duration-color)",
+            "transition-timing-function": "var(--glass-ease), var(--glass-ease), var(--glass-ease-out), var(--glass-ease-out)"
           },
           "[data-slot=\"button\"]:not([data-variant=\"default\"], [data-variant=\"destructive\"])": {
             "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
@@ -432,8 +546,8 @@
           },
           "[data-slot=\"button\"]": {
             "transition-property": "transform, box-shadow, background-color, border-color, filter",
-            "transition-duration": "var(--glass-duration)",
-            "transition-timing-function": "var(--glass-ease)"
+            "transition-duration": "var(--glass-duration), var(--glass-duration), var(--glass-duration-color), var(--glass-duration-color), var(--glass-duration-color)",
+            "transition-timing-function": "var(--glass-ease), var(--glass-ease), var(--glass-ease-out), var(--glass-ease-out), var(--glass-ease-out)"
           },
           "[data-slot=\"button\"], [data-slot=\"badge\"], [data-slot=\"input\"], [data-slot=\"select-trigger\"], [data-slot=\"toggle\"], [data-slot=\"pagination-link\"], [data-slot=\"tabs-trigger\"]": {
             "--radius": "calc(var(--glass-radius-pill) + 2px)",
@@ -509,7 +623,63 @@
           "[data-slot=\"dialog-overlay\"], [data-slot=\"sheet-overlay\"], [data-slot=\"drawer-overlay\"], [data-slot=\"alert-dialog-overlay\"]": {
             "background-color": "var(--glass-scrim)",
             "-webkit-backdrop-filter": "blur(var(--glass-scrim-blur)) saturate(140%)",
-            "backdrop-filter": "blur(var(--glass-scrim-blur)) saturate(140%)"
+            "backdrop-filter": "blur(var(--glass-scrim-blur)) saturate(140%)",
+            "animation": "glass-fade-in var(--glass-duration-enter) var(--glass-ease-out)"
+          },
+          "[data-slot=\"dialog-overlay\"][data-state=\"closed\"], [data-slot=\"sheet-overlay\"][data-state=\"closed\"], [data-slot=\"drawer-overlay\"][data-state=\"closed\"], [data-slot=\"alert-dialog-overlay\"][data-state=\"closed\"]": {
+            "animation": "glass-fade-out var(--glass-duration-exit) var(--glass-ease-out)"
+          },
+          "[data-slot=\"dialog-content\"], [data-slot=\"command\"]": {
+            "animation": "glass-modal-in var(--glass-duration-enter) var(--glass-ease)"
+          },
+          "[data-slot=\"dialog-content\"][data-state=\"closed\"], [data-slot=\"command\"][data-state=\"closed\"]": {
+            "animation": "glass-modal-out var(--glass-duration-exit) var(--glass-ease)"
+          },
+          "[data-slot=\"sheet-content\"], [data-slot=\"drawer-content\"]": {
+            "animation": "glass-sheet-in-bottom var(--glass-duration-enter) var(--glass-ease)"
+          },
+          "[data-slot=\"sheet-content\"][data-state=\"closed\"], [data-slot=\"drawer-content\"][data-state=\"closed\"]": {
+            "animation": "glass-sheet-out-bottom var(--glass-duration-exit) var(--glass-ease)"
+          },
+          "[data-slot=\"sheet-content\"][data-side=\"top\"], [data-slot=\"drawer-content\"][data-side=\"top\"]": {
+            "animation-name": "glass-sheet-in-top"
+          },
+          "[data-slot=\"sheet-content\"][data-side=\"top\"][data-state=\"closed\"], [data-slot=\"drawer-content\"][data-side=\"top\"][data-state=\"closed\"]": {
+            "animation-name": "glass-sheet-out-top"
+          },
+          "[data-slot=\"sheet-content\"][data-side=\"left\"], [data-slot=\"drawer-content\"][data-side=\"left\"]": {
+            "animation-name": "glass-sheet-in-left"
+          },
+          "[data-slot=\"sheet-content\"][data-side=\"left\"][data-state=\"closed\"], [data-slot=\"drawer-content\"][data-side=\"left\"][data-state=\"closed\"]": {
+            "animation-name": "glass-sheet-out-left"
+          },
+          "[data-slot=\"sheet-content\"][data-side=\"right\"], [data-slot=\"drawer-content\"][data-side=\"right\"]": {
+            "animation-name": "glass-sheet-in-right"
+          },
+          "[data-slot=\"sheet-content\"][data-side=\"right\"][data-state=\"closed\"], [data-slot=\"drawer-content\"][data-side=\"right\"][data-state=\"closed\"]": {
+            "animation-name": "glass-sheet-out-right"
+          },
+          "[data-slot=\"popover-content\"], [data-slot=\"hover-card-content\"], [data-slot=\"dropdown-menu-content\"], [data-slot=\"dropdown-menu-sub-content\"], [data-slot=\"context-menu-content\"], [data-slot=\"menubar-content\"], [data-slot=\"select-content\"]": {
+            "animation": "glass-pop-in var(--glass-duration-enter) var(--glass-ease)"
+          },
+          "[data-slot=\"popover-content\"][data-state=\"closed\"], [data-slot=\"hover-card-content\"][data-state=\"closed\"], [data-slot=\"dropdown-menu-content\"][data-state=\"closed\"], [data-slot=\"dropdown-menu-sub-content\"][data-state=\"closed\"], [data-slot=\"context-menu-content\"][data-state=\"closed\"], [data-slot=\"menubar-content\"][data-state=\"closed\"], [data-slot=\"select-content\"][data-state=\"closed\"]": {
+            "animation": "glass-pop-out var(--glass-duration-exit) var(--glass-ease)"
+          },
+          "[data-slot=\"tooltip-content\"]": {
+            "animation": "glass-tip-in 120ms var(--glass-ease)"
+          },
+          "[data-slot=\"tooltip-content\"][data-state=\"closed\"]": {
+            "animation": "glass-tip-out 100ms var(--glass-ease-out)"
+          },
+          "[data-slot=\"accordion-content\"]": {
+            "overflow": "hidden",
+            "animation": "none"
+          },
+          "[data-slot=\"accordion-content\"][data-state=\"open\"]": {
+            "animation": "glass-accordion-in var(--glass-duration) var(--glass-ease)"
+          },
+          "[data-slot=\"accordion-content\"][data-state=\"closed\"]": {
+            "animation": "glass-accordion-out var(--glass-duration-exit) var(--glass-ease)"
           },
           "[data-slot=\"card\"]:hover, [data-slot=\"alert\"]:hover": {
             "background-color": "rgb(var(--glass-white) / var(--glass-fill-hover))",
@@ -552,7 +722,7 @@
             "background-color": "rgb(var(--glass-white) / 0.1)"
           },
           "[data-slot=\"tabs-trigger\"]": {
-            "transition": "background-color var(--glass-duration) var(--glass-ease-out), box-shadow var(--glass-duration) var(--glass-ease-out)",
+            "transition": "background-color var(--glass-duration-color) var(--glass-ease-out), box-shadow var(--glass-duration) var(--glass-ease)",
             "&[data-state=\"active\"]": {
               "background-color": "rgb(var(--glass-white) / 0.14)",
               "box-shadow": "0 1px 0 0 var(--glass-specular-color) inset"
@@ -564,7 +734,8 @@
             "box-shadow": "0 1px 2px 0 rgb(0 0 0 / 0.3) inset"
           },
           "[data-slot=\"switch-thumb\"]": {
-            "box-shadow": "0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 0 0 rgb(var(--glass-white) / 0.5) inset"
+            "box-shadow": "0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 0 0 rgb(var(--glass-white) / 0.5) inset",
+            "transition": "transform var(--glass-duration) var(--glass-ease-spring), background-color var(--glass-duration-color) var(--glass-ease-out)"
           },
           "[data-slot=\"slider-track\"]": {
             "-webkit-backdrop-filter": "blur(var(--glass-blur-flat))",
@@ -573,12 +744,13 @@
           },
           "[data-slot=\"slider-thumb\"]": {
             "box-shadow": "0 1px 4px 0 rgb(0 0 0 / 0.4), 0 1px 0 0 rgb(var(--glass-white) / 0.5) inset",
-            "transition": "transform var(--glass-duration-fast) var(--glass-ease)",
+            "transition": "transform var(--glass-duration) var(--glass-ease)",
             "&:hover": {
               "transform": "scale(1.12)"
             },
             "&:active": {
-              "transform": "scale(1.04)"
+              "transform": "scale(1.04)",
+              "transition-duration": "var(--glass-duration-fast)"
             }
           },
           "[data-slot=\"table-header\"]": {

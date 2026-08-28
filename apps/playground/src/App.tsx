@@ -46,7 +46,7 @@ function Section({
   return (
     <section className="space-y-6">
       <div className="glass-reveal space-y-2">
-        <p className="text-xs font-medium tracking-[0.18em] uppercase" style={{ color: "var(--glass-accent)" }}>
+        <p className="text-xs font-medium tracking-(--glass-tracking-caps) uppercase" style={{ color: "var(--glass-accent)" }}>
           {eyebrow}
         </p>
         <h2 className="text-2xl font-bold">{title}</h2>

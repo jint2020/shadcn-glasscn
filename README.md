@@ -279,7 +279,7 @@ pnpm exec playwright install chromium   # verify 要用，装一次
 pnpm dev                 # 预览站
 pnpm build               # 构建预览站
 pnpm registry:build      # 生成 registry 产物
-pnpm verify              # 32 项浏览器断言
+pnpm verify              # 37 项浏览器断言
 pnpm screenshot          # 重新生成 docs/screenshots/
 ```
 

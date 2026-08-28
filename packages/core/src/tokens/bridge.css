@@ -101,6 +101,8 @@
   --blur-glass-overlay: var(--glass-blur-overlay);
   --blur-glass-modal: var(--glass-blur-modal);
   --ease-glass: var(--glass-ease);
+  --ease-glass-out: var(--glass-ease-out);
+  --ease-glass-spring: var(--glass-ease-spring);
   --radius-pill: var(--glass-radius-pill);
   --color-glass-accent: var(--glass-accent);
 }

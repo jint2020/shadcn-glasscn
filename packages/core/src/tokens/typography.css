@@ -25,11 +25,16 @@
 
   /* 标题：几何感、字距收紧、随视口流体缩放 */
   --glass-tracking-heading: -0.02em;
+  /* 小字排印：正字距。全大写的 eyebrow / 徽章字距必须拉开，
+     否则字母糊在一起 -- 这是 tracking 是尺寸函数的另一端。 */
+  --glass-tracking-caps: 0.14em;
   --glass-text-h1: clamp(2.5rem, 5vw, 4.5rem);
   --glass-text-h2: clamp(1.8rem, 3vw, 3rem);
   --glass-text-h3: 1.5rem;
 
-  /* 正文：行高给足，玻璃上的长文本需要更多呼吸 */
+  /* 行高随字号反向走（WWDC「UI 字体排印」）：大标题收紧贴排，
+     正文给足呼吸。玻璃上的长文本需要更多行高。 */
+  --glass-leading-heading: 1.1;
   --glass-leading-body: 1.75;
 }
 
