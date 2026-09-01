@@ -10,7 +10,7 @@
  * 想换整体气质，换的是背后光斑（blob）的颜色，不是玻璃的颜色。
  * 这条一破，玻璃立刻变成"有色半透明塑料片"。
  *
- * 暗色优先：Ember & Slate 是默认，浅色是 palettes/liquid-light 的变体。
+ * 暗色优先：统一主题默认写在 :root，不依赖 palette 切换。
  * ==========================================================================*/
 
 :root {
@@ -18,17 +18,17 @@
 
   /* --- 折射 -------------------------------------------------------------- */
   /* 模糊基数。所有档位由它派生，改这一个值整体调厚度。 */
-  --glass-blur-base: 20px;
+  --glass-blur-base: 18px;
 
   /* saturate 必须和 blur 一起用。只有 blur 的话，背后的颜色透过来会发灰，
      看着像磨砂塑料；saturate 让颜色"绽"出来，这才是玻璃感的真正来源。 */
-  --glass-saturate: 180%;
+  --glass-saturate: 170%;
   --glass-brightness: 1;
 
   /* --- 玻璃填充（白色中性，不可改成有色） -------------------------------- */
   --glass-white: 255 255 255;
-  --glass-fill: 0.08;
-  --glass-fill-hover: 0.13;
+  --glass-fill: 0.1;
+  --glass-fill-hover: 0.15;
 
   /* 通透度是独立于调色的一条轴。三档，靠 data-glass-density 切换，
      见 primitives/surface.css 末尾。
@@ -37,15 +37,18 @@
        heavy    接近不透明，戏剧化、可读性最好 */
 
   /* --- 边缘光学 ---------------------------------------------------------- */
-  --glass-border-alpha: 0.12;
-  --glass-border-alpha-hover: 0.22;
+  --glass-border-alpha: 0.16;
+  --glass-border-alpha-hover: 0.28;
   --glass-border-width: 1px;
+  --glass-border-top-alpha: 0.34;
+  --glass-border-bottom-alpha: 0.1;
 
   /* 高光 (specular)：顶边 1px 内阴影，模拟玻璃的物理厚度接到顶光。
      这是 Apple Liquid Glass 的签名，也是"真玻璃"和"一块模糊的板子"
      之间唯一的区别。不可省。 */
-  --glass-specular: 0.2;
+  --glass-specular: 0.24;
   --glass-specular-size: 0 1px 0 0;
+  --glass-inner-glow: 0 0 20px rgb(var(--glass-white) / 0.08) inset;
 
   /* 底边暗线：暗色下不需要（背景本来就暗），浅色调色里会打开。
      默认 none，靠调色覆写。 */
@@ -53,8 +56,12 @@
 
   /* --- 投影 --------------------------------------------------------------- */
   /* 比常规暗色 UI 更深，玻璃需要更强的投影才能从背景里分离出来 */
-  --glass-shadow-base: 0 12px 40px rgb(0 0 0 / 0.35);
-  --glass-shadow-hover: 0 20px 60px rgb(0 0 0 / 0.5);
+  --glass-shadow-base:
+    0 10px 30px rgb(0 0 0 / 0.28),
+    0 2px 8px rgb(0 0 0 / 0.14);
+  --glass-shadow-hover:
+    0 18px 46px rgb(0 0 0 / 0.34),
+    0 4px 14px rgb(0 0 0 / 0.2);
 
   /* --- 运动 --------------------------------------------------------------- */
   /* 缓动哲学对齐 Apple（阻尼比 + 响应，见 WWDC「流体界面」）：
@@ -62,10 +69,10 @@
      被甩出去的，不该弹；过冲只属于带着动量的手势（拨开关、倾斜回弹）。
      旧版把过冲曲线用在所有 hover 上，手感是"弹跳的塑料"，已废弃。 */
   --glass-duration-fast: 80ms;       /* active 要"啪"地一下，不能拖 */
-  --glass-duration: 240ms;           /* 位移/投影：等效响应 ~0.35s 的弹簧 */
+  --glass-duration: 220ms;           /* 位移/投影 */
   --glass-duration-slow: 600ms;      /* 滚动揭示专用，只有它配用慢档 */
-  --glass-duration-color: 150ms;     /* 颜色反馈比位移快一拍 */
-  --glass-duration-enter: 240ms;     /* 浮层物化入场 */
+  --glass-duration-color: 140ms;     /* 颜色反馈比位移快一拍 */
+  --glass-duration-enter: 220ms;     /* 浮层物化入场 */
   --glass-duration-exit: 160ms;      /* 退场比入场快 -- 离开不该有仪式感 */
 
   /* 阻尼 1.0 · 响应 ~0.35s：transform 和投影的默认曲线 */
@@ -78,12 +85,12 @@
   --glass-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* --- 交互位移 ----------------------------------------------------------- */
-  --glass-lift: 4px;
+  --glass-lift: 3px;
   --glass-press: 1px;
   --glass-press-scale: 0.97;
 
   /* --- 微光扫过 (shimmer) -------------------------------------------------- */
-  --glass-shimmer-alpha: 0.14;
+  --glass-shimmer-alpha: 0.12;
   --glass-shimmer-angle: -20deg;
   --glass-shimmer-duration: 900ms;
 

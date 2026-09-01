@@ -26,18 +26,8 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useGlassReveal } from "@/hooks/use-glass-reveal"
 
-const PALETTES = [
-  { id: "ember-slate", label: "Ember & Slate", swatch: "#f59e0b" },
-  { id: "ocean-frost", label: "Ocean Frost", swatch: "#22d3ee" },
-  { id: "soft-bloom", label: "Soft Bloom", swatch: "#e879f9" },
-  { id: "warm-sunset", label: "Warm Sunset", swatch: "#fb923c" },
-  { id: "emerald-mist", label: "Emerald Mist", swatch: "#34d399" },
-  { id: "liquid-light", label: "Liquid Light", swatch: "#7c3aed" },
-] as const
-
 const DENSITIES = ["sheer", "frosted", "heavy"] as const
 
-type Palette = (typeof PALETTES)[number]["id"]
 type Density = (typeof DENSITIES)[number]
 
 function Section({
@@ -58,12 +48,7 @@ function Section({
 }
 
 export default function App() {
-  const [palette, setPalette] = useState<Palette>("ember-slate")
   const [density, setDensity] = useState<Density>("frosted")
-
-  useEffect(() => {
-    document.documentElement.dataset.glassPalette = palette
-  }, [palette])
 
   useEffect(() => {
     if (density === "frosted") delete document.documentElement.dataset.glassDensity
@@ -104,7 +89,7 @@ export default function App() {
         {/* ---------- Hero ---------- */}
         <section className="glass-reveal space-y-6">
           <Badge variant="outline">
-            v0.2 · {PALETTES.find((p) => p.id === palette)?.label}
+            v0.2 · Unified Glass Theme
           </Badge>
           <h1 className="max-w-4xl">玻璃没有自己的颜色</h1>
           <p className="max-w-2xl text-base">
@@ -125,35 +110,12 @@ export default function App() {
         {/* ---------- 控制台 ---------- */}
         <Card className="glass-premium glass-reveal">
           <CardHeader>
-            <CardTitle>调色与通透度</CardTitle>
+            <CardTitle>统一主题与通透度</CardTitle>
             <CardDescription>
-              换调色换的是背后的光斑，玻璃填充在六套里完全一致
+              palette 体系已退出主路径，保留统一玻璃语义与密度轴
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-3">
-              <Label className="text-xs" style={{ color: "var(--glass-text-muted)" }}>调色</Label>
-              <div className="flex flex-wrap gap-2">
-                {PALETTES.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setPalette(p.id)}
-                    data-slot="button"
-                    data-variant="outline"
-                    aria-pressed={palette === p.id}
-                    className="inline-flex h-9 items-center gap-2 border px-4 text-sm font-medium"
-                    style={
-                      palette === p.id
-                        ? { borderColor: p.swatch, background: "rgb(255 255 255 / 0.13)" }
-                        : undefined
-                    }
-                  >
-                    <span className="size-2.5 rounded-full" style={{ background: p.swatch }} />
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-            </div>
             <div className="space-y-3">
               <Label className="text-xs" style={{ color: "var(--glass-text-muted)" }}>通透度</Label>
               <Tabs value={density} onValueChange={(v) => setDensity(v as Density)}>
@@ -236,7 +198,7 @@ export default function App() {
         <Section
           eyebrow="Elevation · overlay / modal"
           title="浮层类"
-          note="菜单单列一档：blur 28 + saturate 200%，比 modal 更薄但饱和更高 —— 菜单浮在内容正上方很近的距离，太厚会让下面彻底消失，失去空间关系。"
+          note="统一层级收敛为 floating：浮层与菜单共享更干净的模糊和边缘光，modal 再向上加厚一档。"
         >
           <div className="flex flex-wrap items-center gap-3">
             <Dialog>
@@ -314,11 +276,10 @@ export default function App() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow><TableCell>flat</TableCell><TableCell>输入框 / 徽章 / 表格</TableCell><TableCell className="tabular-nums">16px</TableCell><TableCell className="tabular-nums">.06</TableCell></TableRow>
-                  <TableRow><TableCell>raised</TableCell><TableCell>卡片 / 次级按钮</TableCell><TableCell className="tabular-nums">20px</TableCell><TableCell className="tabular-nums">.08</TableCell></TableRow>
-                  <TableRow><TableCell>overlay</TableCell><TableCell>导航 / 浮层 / 侧边栏</TableCell><TableCell className="tabular-nums">24px</TableCell><TableCell className="tabular-nums">.10</TableCell></TableRow>
-                  <TableRow><TableCell>menu</TableCell><TableCell>下拉 / 上下文菜单</TableCell><TableCell className="tabular-nums">28px</TableCell><TableCell className="tabular-nums">.10</TableCell></TableRow>
-                  <TableRow><TableCell>modal</TableCell><TableCell>对话框 / 抽屉</TableCell><TableCell className="tabular-nums">28px</TableCell><TableCell className="tabular-nums">.12</TableCell></TableRow>
+                  <TableRow><TableCell>base（flat）</TableCell><TableCell>输入框 / 徽章 / 表格</TableCell><TableCell className="tabular-nums">15.84px</TableCell><TableCell className="tabular-nums">.08</TableCell></TableRow>
+                  <TableRow><TableCell>raised</TableCell><TableCell>卡片 / 次级按钮</TableCell><TableCell className="tabular-nums">18px</TableCell><TableCell className="tabular-nums">.10</TableCell></TableRow>
+                  <TableRow><TableCell>floating（overlay）</TableCell><TableCell>导航 / 浮层 / 侧边栏 / 菜单</TableCell><TableCell className="tabular-nums">23.04px</TableCell><TableCell className="tabular-nums">.14</TableCell></TableRow>
+                  <TableRow><TableCell>modal</TableCell><TableCell>对话框 / 抽屉</TableCell><TableCell className="tabular-nums">25.92px</TableCell><TableCell className="tabular-nums">.18</TableCell></TableRow>
                 </TableBody>
               </Table>
             </TabsContent>

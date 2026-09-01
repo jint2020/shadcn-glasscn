@@ -9,22 +9,13 @@
  * 降级方向和亮色主题相反：这里要退到**接近不透明的暗色**，
  * 不是白色。白色 0.94 压在近黑底上会变成一块刺眼的白板。
  *
- * 关于这一整层的 !important —— 不是偷懒，是必须的：
- * 调色用 :root[data-glass-palette="x"]（0,2,0）声明变量，
- * 会稳压这里的 :root（0,1,0）。不加的话用户一旦切换调色，
- * 整层无障碍降级就被静默压掉——自动化测不出来，只有真实用户会踩到。
+ * 这一整层带 !important：必须压住组件层与运行时状态，确保降级永远生效。
  * ==========================================================================*/
 
-/* 降级用的实底。跟着调色走，浅色调色里会被覆写成浅底。 */
+/* 降级用的实底。统一主题下固定深色，保证可读性。 */
 :root {
-  --glass-solid: 20 16 12;
+  --glass-solid: 16 22 34;
 }
-
-:root[data-glass-palette="ocean-frost"] { --glass-solid: 6 16 30; }
-:root[data-glass-palette="soft-bloom"] { --glass-solid: 28 16 32; }
-:root[data-glass-palette="warm-sunset"] { --glass-solid: 30 14 12; }
-:root[data-glass-palette="emerald-mist"] { --glass-solid: 8 28 16; }
-:root[data-glass-palette="liquid-light"] { --glass-solid: 244 240 233; }
 
 /* --- 1. 浏览器不支持 backdrop-filter ------------------------------------- */
 

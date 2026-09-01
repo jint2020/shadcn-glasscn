@@ -1,35 +1,20 @@
 /* ============================================================================
- * glasscn-core/palettes/ember-slate — Ember & Slate —— 暖调近黑 + 琥珀赭石。默认，适合产品后台与工具型界面
+ * glasscn-core/palettes/LEGACY — 兼容层（已弃用）
  * ----------------------------------------------------------------------------
- * 两种用法：
- *   1. 静态套用 —— @import 本文件，全站生效
- *   2. 运行时切换 —— <html data-glass-palette="ember-slate">
- *
- * 玻璃填充在所有调色里都是白色中性，这里只换背景光斑、强调色和文字色调。
+ * 统一玻璃主题已替代 palette 体系。该文件仅保留旧 import 不报错，
+ * 并回落到统一主题，不再提供独立视觉风格。
  * ==========================================================================*/
 
-:root {
-  --glass-bg-base: #100d0a;
-  --glass-bg-mid: #1c1510;
-  --glass-blob-1: #c2410c;
-  --glass-blob-2: #78350f;
-  --glass-blob-3: #f59e0b;
+:root,
+:root[data-glass-palette] {
+  --glass-bg-base: #090f1d;
+  --glass-bg-mid: #121b2f;
+  --glass-blob-1: #60a5fa;
+  --glass-blob-2: #a78bfa;
+  --glass-blob-3: #22d3ee;
   --glass-accent: #f59e0b;
   --glass-accent-hover: #fbbf24;
   --glass-accent-fg: #1a1206;
-  --glass-text-rgb: 255 248 240;
-  color-scheme: dark;
-}
-
-:root[data-glass-palette="ember-slate"] {
-  --glass-bg-base: #100d0a;
-  --glass-bg-mid: #1c1510;
-  --glass-blob-1: #c2410c;
-  --glass-blob-2: #78350f;
-  --glass-blob-3: #f59e0b;
-  --glass-accent: #f59e0b;
-  --glass-accent-hover: #fbbf24;
-  --glass-accent-fg: #1a1206;
-  --glass-text-rgb: 255 248 240;
+  --glass-text-rgb: 244 248 255;
   color-scheme: dark;
 }

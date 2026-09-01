@@ -21,10 +21,10 @@
     transform: translate3d(0, 0, 0) scale(1);
   }
   33% {
-    transform: translate3d(6%, -8%, 0) scale(1.12);
+    transform: translate3d(7%, -7%, 0) scale(1.08);
   }
   66% {
-    transform: translate3d(-5%, 6%, 0) scale(0.92);
+    transform: translate3d(-6%, 5%, 0) scale(0.94);
   }
 }
 
@@ -59,32 +59,32 @@
 
   /* blob 1 —— 左上，最大最亮 */
   &::before {
-    width: 650px;
-    height: 650px;
+    width: 620px;
+    height: 620px;
     top: -12%;
     left: -8%;
-    opacity: 0.55;
+    opacity: 0.46;
     background: radial-gradient(
       circle at 50% 50%,
       var(--glass-blob-1) 0%,
       transparent 68%
     );
-    filter: blur(90px);
+    filter: blur(78px);
   }
 
   /* blob 2 —— 右下 */
   &::after {
-    width: 450px;
-    height: 450px;
+    width: 500px;
+    height: 500px;
     right: -6%;
     bottom: -10%;
-    opacity: 0.5;
+    opacity: 0.42;
     background: radial-gradient(
       circle at 50% 50%,
       var(--glass-blob-2) 0%,
       transparent 68%
     );
-    filter: blur(90px);
+    filter: blur(78px);
     animation-delay: -4s;
   }
 }
@@ -98,19 +98,19 @@
     content: "";
     position: fixed;
     z-index: -1;
-    top: 38%;
-    left: 46%;
-    width: 350px;
-    height: 350px;
+    top: 36%;
+    left: 48%;
+    width: 390px;
+    height: 390px;
     border-radius: 50%;
     pointer-events: none;
-    opacity: 0.42;
+    opacity: 0.36;
     background: radial-gradient(
       circle at 50% 50%,
       var(--glass-blob-3) 0%,
       transparent 68%
     );
-    filter: blur(90px);
+    filter: blur(78px);
     will-change: transform;
     animation: glass-blob-float 10s var(--glass-ease-in-out) -7s infinite;
   }

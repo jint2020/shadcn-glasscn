@@ -1,35 +1,20 @@
 /* ============================================================================
- * glasscn-core/palettes/emerald-mist — Emerald Mist —— 墨绿底 + 翠绿金光斑。沉稳，适合金融与仪表盘
+ * glasscn-core/palettes/LEGACY — 兼容层（已弃用）
  * ----------------------------------------------------------------------------
- * 两种用法：
- *   1. 静态套用 —— @import 本文件，全站生效
- *   2. 运行时切换 —— <html data-glass-palette="emerald-mist">
- *
- * 玻璃填充在所有调色里都是白色中性，这里只换背景光斑、强调色和文字色调。
+ * 统一玻璃主题已替代 palette 体系。该文件仅保留旧 import 不报错，
+ * 并回落到统一主题，不再提供独立视觉风格。
  * ==========================================================================*/
 
-:root {
-  --glass-bg-base: #051a0a;
-  --glass-bg-mid: #0a2a14;
-  --glass-blob-1: #10b981;
-  --glass-blob-2: #d4af37;
-  --glass-blob-3: #065f46;
-  --glass-accent: #34d399;
-  --glass-accent-hover: #6ee7b7;
-  --glass-accent-fg: #04170a;
-  --glass-text-rgb: 240 253 244;
-  color-scheme: dark;
-}
-
-:root[data-glass-palette="emerald-mist"] {
-  --glass-bg-base: #051a0a;
-  --glass-bg-mid: #0a2a14;
-  --glass-blob-1: #10b981;
-  --glass-blob-2: #d4af37;
-  --glass-blob-3: #065f46;
-  --glass-accent: #34d399;
-  --glass-accent-hover: #6ee7b7;
-  --glass-accent-fg: #04170a;
-  --glass-text-rgb: 240 253 244;
+:root,
+:root[data-glass-palette] {
+  --glass-bg-base: #090f1d;
+  --glass-bg-mid: #121b2f;
+  --glass-blob-1: #60a5fa;
+  --glass-blob-2: #a78bfa;
+  --glass-blob-3: #22d3ee;
+  --glass-accent: #f59e0b;
+  --glass-accent-hover: #fbbf24;
+  --glass-accent-fg: #1a1206;
+  --glass-text-rgb: 244 248 255;
   color-scheme: dark;
 }

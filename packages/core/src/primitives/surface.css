@@ -14,11 +14,19 @@
 
 @utility glass-surface {
   background-color: rgb(var(--glass-white) / var(--glass-fill-current));
+  background-image: linear-gradient(
+    138deg,
+    rgb(var(--glass-white) / calc(var(--glass-fill-current) + 0.08)) 0%,
+    rgb(var(--glass-white) / calc(var(--glass-fill-current) + 0.02)) 42%,
+    rgb(var(--glass-white) / calc(var(--glass-fill-current) + 0.04)) 100%
+  );
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: var(--glass-border-width) solid var(--glass-border);
+  border: var(--glass-border-width) solid rgb(var(--glass-white) / var(--glass-border-bottom-alpha));
   box-shadow:
+    0 0.5px 0 0 rgb(var(--glass-white) / var(--glass-border-top-alpha)) inset,
     var(--glass-specular-size) var(--glass-specular-color) inset,
+    var(--glass-inner-glow),
     var(--glass-underline),
     var(--glass-shadow);
   border-radius: var(--glass-radius-card);
@@ -75,6 +83,11 @@
 
 @utility glass-nav {
   background-color: rgb(var(--glass-white) / var(--glass-fill-nav));
+  background-image: linear-gradient(
+    180deg,
+    rgb(var(--glass-white) / 0.2) 0%,
+    rgb(var(--glass-white) / var(--glass-fill-nav)) 75%
+  );
   -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturate));
   border: 0;
@@ -117,14 +130,21 @@
    太厚会让下面的内容彻底消失，失去空间关系。 */
 
 @utility glass-menu {
-  background-color: rgb(var(--glass-white) / 0.1);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
-  backdrop-filter: blur(28px) saturate(200%);
-  border: var(--glass-border-width) solid rgb(var(--glass-white) / 0.14);
+  background-color: rgb(var(--glass-white) / var(--glass-fill-floating-tier));
+  background-image: linear-gradient(
+    140deg,
+    rgb(var(--glass-white) / 0.26) 0%,
+    rgb(var(--glass-white) / 0.12) 52%,
+    rgb(var(--glass-white) / 0.16) 100%
+  );
+  -webkit-backdrop-filter: blur(var(--glass-blur-floating-tier)) saturate(190%);
+  backdrop-filter: blur(var(--glass-blur-floating-tier)) saturate(190%);
+  border: var(--glass-border-width) solid rgb(var(--glass-white) / 0.2);
   border-radius: var(--glass-radius-card);
   box-shadow:
-    0 1px 0 0 rgb(var(--glass-white) / 0.18) inset,
-    0 20px 60px rgb(0 0 0 / 0.4);
+    0 0.5px 0 0 rgb(var(--glass-white) / 0.32) inset,
+    var(--glass-inner-glow),
+    var(--glass-shadow-floating-tier);
   overflow: hidden;
 }
 

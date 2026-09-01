@@ -11,11 +11,11 @@ shadcn/ui 的 Liquid Glass 主题层。暗色优先，纯 CSS，零运行时，�
 <table>
 <tr>
 <td width="50%"><img src="docs/screenshots/components-base.jpg" alt="Ember & Slate"></td>
-<td width="50%"><img src="docs/screenshots/palette-liquid-light.jpg" alt="Liquid Light"></td>
+<td width="50%"><img src="docs/screenshots/components-form.jpg" alt="Unified Glass Theme"></td>
 </tr>
 <tr>
-<td align="center"><sub><code>ember-slate</code> · 默认</sub></td>
-<td align="center"><sub><code>liquid-light</code> · 浅色</sub></td>
+<td align="center"><sub><code>unified-theme</code> · 默认</sub></td>
+<td align="center"><sub><code>density-axis</code> · sheer / frosted / heavy</sub></td>
 </tr>
 </table>
 
@@ -32,7 +32,7 @@ shadcn/ui 的 Liquid Glass 主题层。暗色优先，纯 CSS，零运行时，�
 想换整体气质，换的是背后光斑的颜色，不是玻璃的颜色。
 
 这条一破，玻璃立刻变成"有色半透明塑料片"。库里有两道自动闸挡它：
-`pnpm verify` 断言六套调色的玻璃填充完全一致，CI 另外扫一遍 registry 产物
+`pnpm verify` 断言统一主题下玻璃填充保持白中性，CI 另外扫一遍 registry 产物
 里所有 `--glass-fill*` 变量，出现颜色值就让构建失败。
 
 ---
@@ -45,8 +45,7 @@ shadcn/ui 的 Liquid Glass 主题层。暗色优先，纯 CSS，零运行时，�
 /* globals.css */
 @import "tailwindcss";
 /* ... 你原有的 shadcn 变量 ... */
-@import "glasscn-core";                        /* ← 加这一行 */
-@import "glasscn-core/palettes/switchable.css"; /* 想运行时切调色再加 */
+@import "glasscn-core"; /* ← 加这一行 */
 ```
 
 ```html
@@ -74,7 +73,6 @@ shadcn add @glasscn/glass-theme
 | item | 内容 |
 |---|---|
 | `glass-theme` | 主题本体：材质变量 + shadcn 自动桥 + 降级层 |
-| `glass-palettes` | 六套调色，运行时可切 |
 | `glass-core` | 把完整 CSS 层复制进项目（不走 npm 依赖） |
 | `use-glass-reveal` | 滚动揭示的老浏览器兜底 |
 | `use-glass-tilt` | 3D 倾斜（Expressive 档） |
@@ -94,11 +92,10 @@ shadcn add @glasscn/glass-theme
 
 | 档位 | 组件 | 模糊 | 填充 |
 |---|---|---|---|
-| `flat` | Input / Badge / Table | 16px | .06 |
-| `raised` | Card / 次级按钮 / Alert | 20px | .08 |
-| `overlay` | 导航 / Popover / Sidebar | 24px | .10 |
-| `menu` | 下拉 / 上下文菜单 | 28px `saturate 200%` | .10 |
-| `modal` | Dialog / Sheet / Command | 28px `saturate 200%` | .12 |
+| `base`（兼容 `flat`） | Input / Badge / Table | 15.84px | .08 |
+| `raised` | Card / 次级按钮 / Alert | 18px | .10 |
+| `floating`（兼容 `overlay`） | 导航 / Popover / Sidebar / 菜单 | 23.04px | .14 |
+| `modal` | Dialog / Sheet / Command | 25.92px `saturate 190%` | .18 |
 
 改 `--glass-blur-base` 一个值，整套等比缩放。
 
@@ -148,22 +145,10 @@ box-shadow: 0 1px 0 0 rgba(255,255,255,0.20) inset;
 
 ---
 
-## 六套调色
+## 统一主题（替代 palette 体系）
 
-```ts
-document.documentElement.dataset.glassPalette = "ocean-frost"
-```
-
-| 调色 | 底色 | 光斑 | 气质 |
-|---|---|---|---|
-| `ember-slate` | `#100d0a` | 琥珀 / 赭石 / 棕 | 暖、编辑感（默认） |
-| `ocean-frost` | `#030d1a` | 青 / 蓝 / 靛 | 冷静、技术感 |
-| `soft-bloom` | `#1a0e1c` | 紫 / 粉 / 靛 | 柔和、有情绪 |
-| `warm-sunset` | `#1a0a0a` | 橙 / 洋红 / 琥珀 | 热烈 |
-| `emerald-mist` | `#051a0a` | 翠 / 金 / 墨绿 | 沉稳、奢感 |
-| `liquid-light` | `#f0ebe3` | 紫 / 青 / 橙 | 唯一的浅色 |
-
-**六套里玻璃填充完全一致。** 换的只是光斑、强调色和文字色调。
+新版默认就是统一玻璃主题，不再把 palette 作为主路径。  
+若历史项目仍设置了 `data-glass-palette`，会进入兼容层并回落到统一主题，不再分叉视觉。
 
 另有一条独立于调色的通透度轴：
 
@@ -210,9 +195,8 @@ document.documentElement.dataset.glassDensity = "sheer" // sheer | frosted | hea
 不处理的话整页会以 `opacity: 0` 印出来——一张白纸。同样的坑还有打印预览、
 无头截图服务、部分爬虫。
 
-降级层整层带 `!important`，因为调色用 `:root[data-glass-palette]`（0,2,0）
-会稳压降级层的 `:root`（0,1,0）——不加的话用户一切换调色，
-整层无障碍降级就被静默压掉。
+降级层整层带 `!important`，因为它需要稳压组件层和运行时状态，
+保证无障碍降级不会被静默压掉。
 
 ---
 
@@ -247,8 +231,8 @@ CSS 层按目录粒度拆分：
 packages/core/src/
 ├── tokens/
 │   ├── primitives.css    材质原语（白色玻璃 / 模糊 / 高光 / 运动 / 圆角）
-│   ├── palette.css       Ember & Slate 默认调色
-│   ├── elevation.css     五档高度阶梯
+│   ├── palette.css       统一玻璃主题（背景/光斑/强调色）
+│   ├── elevation.css     三档语义层级 + 兼容别名
 │   ├── typography.css    字体 token（不加载字体）
 │   └── bridge.css        shadcn 变量接管 + 阴影量表
 ├── primitives/
@@ -258,7 +242,7 @@ packages/core/src/
 │   ├── reveal.css        滚动揭示 + 骨架屏
 │   └── fallback.css      六条降级路径
 ├── bridge/auto.css       data-slot 零侵入层
-└── palettes/             六套调色
+└── palettes/             legacy 兼容层（已弃用）
 
 packages/registry/        registry 生成器（从 CSS 反推，不手抄）
 apps/playground/          预览站

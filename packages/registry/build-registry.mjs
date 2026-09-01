@@ -64,12 +64,8 @@ function extractVars(css, selector) {
 }
 
 /**
- * 这套设计是暗色优先的：Ember & Slate 就写在 :root 里，没有 .dark 变体。
- * 浅色是 palettes/liquid-light 这一套调色，走 data-glass-palette 属性，
- * 不走 shadcn 的 .dark 类。
- *
- * 所以 cssVars 只填 light（registry 的字段名，实际内容是暗色默认值），
- * dark 留空 —— 填重复的一份只会让 shadcn CLI 写两遍同样的东西。
+ * 这套设计是暗色优先的统一主题，默认直接写在 :root，没有 .dark 变体。
+ * 所以 cssVars 只填 light（registry 字段名，实际承载默认主题），dark 留空。
  */
 const read = (f) => fs.readFileSync(path.join(CORE, f), "utf8")
 
@@ -185,8 +181,7 @@ const registry = {
       docs:
         "装完即生效：CLI 会把玻璃变量写进你的 globals.css，并接管 shadcn 的 " +
         "data-slot，现有组件不用重新 add。\n" +
-        "· 换材质：再装 glass-presets，然后 " +
-        'document.documentElement.dataset.glassPreset = "vellum"\n' +
+        "· 统一主题：不再依赖 palette 切换，默认即生效\n" +
         "· 局部关掉：任意元素加 data-glass=\"off\"\n" +
         '· 整站降级：<html data-glass-perf="lite">\n\n' +
         "⚠ 还需手动加一行（降级与无障碍，别省）：\n" +
@@ -207,26 +202,6 @@ const registry = {
       })),
       docs:
         '在你的 globals.css 里，shadcn 变量之后加一行：@import "./glass/index.css";',
-    },
-    {
-      name: "glass-palettes",
-      type: "registry:item",
-      title: "Glass Palettes",
-      description:
-        "六套调色（Ember & Slate / Ocean Frost / Soft Bloom / Warm Sunset / " +
-        "Emerald Mist / Liquid Light），按 data-glass-palette 属性运行时切换。",
-      files: [
-        "ember-slate", "ocean-frost", "soft-bloom",
-        "warm-sunset", "emerald-mist", "liquid-light", "switchable",
-      ].map((n) => ({
-        path: `packages/core/src/palettes/${n}.css`,
-        type: "registry:file",
-        target: `~/styles/glass/palettes/${n}.css`,
-      })),
-      docs:
-        'document.documentElement.dataset.glassPalette = "ocean-frost" 即可切换。\n' +
-        "换调色换的是背后的光斑和强调色 —— 玻璃填充在六套里完全一致，" +
-        "永远是白色中性。这是这套设计的核心规则，别改成有色填充。",
     },
     {
       name: "use-glass-reveal",
