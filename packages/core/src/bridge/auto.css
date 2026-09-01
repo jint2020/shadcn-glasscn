@@ -217,22 +217,21 @@
     --glass-shadow: var(--glass-shadow-overlay);
   }
 
-  /* 菜单类单独一档：blur 28 saturate 200%，填充 .10、描边 .14。
-     比 modal 稍薄但饱和更高 —— 菜单浮在内容正上方很近的距离，
-     太厚会让下面的内容彻底消失，失去空间关系。 */
+  /* 菜单类：统一归入 floating 层级，保留更高饱和以增强近场分离。 */
   [data-slot="dropdown-menu-content"],
   [data-slot="dropdown-menu-sub-content"],
   [data-slot="context-menu-content"],
   [data-slot="menubar-content"],
   [data-slot="select-content"] {
-    --glass-blur: 28px;
-    --glass-saturate: 200%;
-    --glass-fill-current: 0.1;
-    --glass-shadow: 0 20px 60px rgb(0 0 0 / 0.4);
-    --popover: rgb(var(--glass-white) / 0.1);
-    border-color: rgb(var(--glass-white) / 0.14);
+    --glass-blur: var(--glass-blur-floating-tier);
+    --glass-saturate: 190%;
+    --glass-fill-current: var(--glass-fill-floating-tier);
+    --glass-shadow: var(--glass-shadow-floating-tier);
+    --popover: rgb(var(--glass-white) / var(--glass-fill-floating-tier));
+    border-color: rgb(var(--glass-white) / 0.2);
     box-shadow:
-      0 1px 0 0 rgb(var(--glass-white) / 0.18) inset,
+      0 0.5px 0 0 rgb(var(--glass-white) / 0.32) inset,
+      var(--glass-inner-glow),
       var(--glass-shadow);
     overflow: hidden;
   }

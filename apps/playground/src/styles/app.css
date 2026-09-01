@@ -56,7 +56,6 @@
 
 /* ---------- glasscn：一行接管 ---------- */
 @import "glasscn-core";
-@import "glasscn-core/palettes/switchable.css";
 
 @layer base {
   * {

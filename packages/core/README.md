@@ -24,8 +24,7 @@ npm i glasscn-core
 ```css
 @import "tailwindcss";
 /* ... 你原有的 shadcn :root / .dark 变量 ... */
-@import "glasscn-core";                         /* ← 加这一行 */
-@import "glasscn-core/palettes/switchable.css"; /* 想运行时切调色再加 */
+@import "glasscn-core"; /* ← 加这一行 */
 ```
 
 ```html
@@ -43,17 +42,10 @@ npm i glasscn-core
 `prefers-reduced-transparency`、`prefers-contrast`、`prefers-reduced-motion`、
 打印、性能降级六种情况。
 
-## 六套调色
+## 统一主题（替代 palette 体系）
 
-```ts
-document.documentElement.dataset.glassPalette = "ocean-frost"
-```
-
-`ember-slate`（默认）· `ocean-frost` · `soft-bloom` · `warm-sunset` ·
-`emerald-mist` · `liquid-light`（唯一浅色）。
-
-**六套里玻璃填充完全一致**，换的只是背后的光斑和强调色——玻璃永远是
-`rgba(255,255,255,N)` 白色中性。这是这套设计的核心规则。
+新版默认使用统一玻璃主题，不再以 palette 作为主路径。  
+旧项目若仍写了 `data-glass-palette`，会自动回落到同一套统一主题（兼容层）。
 
 ## 按需引入
 

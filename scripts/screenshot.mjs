@@ -45,29 +45,13 @@ async function primeReveals() {
 }
 await primeReveals()
 
-// 点真实按钮而不是直接改 DOM 属性 —— 直接改属性会让 React 状态和
-// 页面表现脱节（选中态高亮停在旧的那一项），截出来的图是自相矛盾的
-const LABEL = {
-  "ember-slate": "Ember & Slate", "ocean-frost": "Ocean Frost",
-  "soft-bloom": "Soft Bloom", "warm-sunset": "Warm Sunset",
-  "emerald-mist": "Emerald Mist", "liquid-light": "Liquid Light",
-}
-const setPalette = async (id) => {
-  await page.getByRole("button", { name: LABEL[id], exact: true }).click()
-  await page.waitForTimeout(900)
-}
 const setDensity = async (d) => {
   await page.getByRole("tab", { name: d, exact: true }).click()
   await page.waitForTimeout(700)
 }
 
-for (const p of ["ember-slate", "ocean-frost", "soft-bloom", "warm-sunset", "emerald-mist", "liquid-light"]) {
-  await setPalette(p)
-  await page.screenshot({ path: `docs/screenshots/palette-${p}.jpg`, quality: 86 })
-  console.log("shot: palette", p)
-}
-
-await setPalette("ember-slate")
+await page.screenshot({ path: "docs/screenshots/theme-unified.jpg", quality: 86 })
+console.log("shot: theme-unified")
 
 // 组件区：滚到基础层那一段，截一屏
 await page.evaluate(() => {

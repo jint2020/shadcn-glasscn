@@ -1,129 +1,19 @@
 /* ============================================================================
- * glasscn-core/palettes/switchable — 运行时切换调色
+ * glasscn-core/palettes/switchable — 兼容层（已弃用）
  * ----------------------------------------------------------------------------
- *   document.documentElement.dataset.glassPalette = "ocean-frost"
- *
- * 特异性 :root[data-glass-palette] = (0,2,0)，稳压 tokens/palette.css 的
- * :root = (0,1,0)，所以 @import 顺序不影响结果。
- * 不写属性时回落到 Ember & Slate。
+ * 旧版通过 data-glass-palette 切换六套调色。
+ * 新版已收敛为统一主题，保留该文件仅为兼容旧项目，不再产生视觉分叉。
  * ==========================================================================*/
 
-/* --- Ember & Slate —— 暖调近黑 + 琥珀赭石。默认，适合产品后台与工具型界面 --- */
-:root[data-glass-palette="ember-slate"] {
-  --glass-bg-base: #100d0a;
-  --glass-bg-mid: #1c1510;
-  --glass-blob-1: #c2410c;
-  --glass-blob-2: #78350f;
-  --glass-blob-3: #f59e0b;
+:root[data-glass-palette] {
+  --glass-bg-base: #090f1d;
+  --glass-bg-mid: #121b2f;
+  --glass-blob-1: #60a5fa;
+  --glass-blob-2: #a78bfa;
+  --glass-blob-3: #22d3ee;
   --glass-accent: #f59e0b;
   --glass-accent-hover: #fbbf24;
   --glass-accent-fg: #1a1206;
-  --glass-text-rgb: 255 248 240;
+  --glass-text-rgb: 244 248 255;
   color-scheme: dark;
-}
-
-/* --- Ocean Frost —— 深海蓝底 + 青蓝靛光斑。冷静、克制，适合数据密集界面 --- */
-:root[data-glass-palette="ocean-frost"] {
-  --glass-bg-base: #030d1a;
-  --glass-bg-mid: #07182b;
-  --glass-blob-1: #06b6d4;
-  --glass-blob-2: #0ea5e9;
-  --glass-blob-3: #6366f1;
-  --glass-accent: #22d3ee;
-  --glass-accent-hover: #67e8f9;
-  --glass-accent-fg: #031018;
-  --glass-text-rgb: 240 249 255;
-  color-scheme: dark;
-}
-
-/* --- Soft Bloom —— 紫调暗底 + 紫粉靛光斑。柔和、有情绪，适合内容型与创意类界面 --- */
-:root[data-glass-palette="soft-bloom"] {
-  --glass-bg-base: #1a0e1c;
-  --glass-bg-mid: #2a1830;
-  --glass-blob-1: #c084fc;
-  --glass-blob-2: #f472b6;
-  --glass-blob-3: #818cf8;
-  --glass-accent: #e879f9;
-  --glass-accent-hover: #f0abfc;
-  --glass-accent-fg: #1a0a1c;
-  --glass-text-rgb: 253 244 255;
-  color-scheme: dark;
-}
-
-/* --- Warm Sunset —— 红褐底 + 橙粉琥珀光斑。热烈，适合营销页与落地页 --- */
-:root[data-glass-palette="warm-sunset"] {
-  --glass-bg-base: #1a0a0a;
-  --glass-bg-mid: #2b1210;
-  --glass-blob-1: #f97316;
-  --glass-blob-2: #ec4899;
-  --glass-blob-3: #f59e0b;
-  --glass-accent: #fb923c;
-  --glass-accent-hover: #fdba74;
-  --glass-accent-fg: #1a0a06;
-  --glass-text-rgb: 255 245 237;
-  color-scheme: dark;
-}
-
-/* --- Emerald Mist —— 墨绿底 + 翠绿金光斑。沉稳，适合金融与仪表盘 --- */
-:root[data-glass-palette="emerald-mist"] {
-  --glass-bg-base: #051a0a;
-  --glass-bg-mid: #0a2a14;
-  --glass-blob-1: #10b981;
-  --glass-blob-2: #d4af37;
-  --glass-blob-3: #065f46;
-  --glass-accent: #34d399;
-  --glass-accent-hover: #6ee7b7;
-  --glass-accent-fg: #04170a;
-  --glass-text-rgb: 240 253 244;
-  color-scheme: dark;
-}
-
-/* --- Liquid Glass / Light —— 暖米白底 + 紫青橙光斑。唯一的浅色调色，玻璃更实、高光更厚 --- */
-:root[data-glass-palette="liquid-light"] {
-  --glass-bg-base: #f0ebe3;
-  --glass-bg-mid: #e6dfd4;
-  --glass-blob-1: #a78bfa;
-  --glass-blob-2: #5eead4;
-  --glass-blob-3: #fb923c;
-  --glass-accent: #7c3aed;
-  --glass-accent-hover: #8b5cf6;
-  --glass-accent-fg: #faf7ff;
-  color-scheme: light;
-
-  /* 浅底上的玻璃：白色填充在白底上几乎看不见，所以要拉高不透明度，
-     并把描边换成暗色 —— 否则面板边界会整个消失。 */
-  --glass-fill: 0.45;
-  --glass-fill-hover: 0.58;
-  --glass-border-alpha: 0.6;
-  --glass-border-alpha-hover: 0.8;
-
-  /* 浅色下玻璃更厚：blur 24 / saturate 200%，高光更亮更粗，
-     并且底边多一道极淡的暗线 —— 浅底上只有顶高光会让面板"飘"，
-     底边那道暗线把它按回平面里。 */
-  --glass-blur-base: 24px;
-  --glass-saturate: 200%;
-  --glass-specular: 0.8;
-  --glass-specular-size: 0 2px 0 0;
-  --glass-underline: 0 -1px 0 0 rgb(0 0 0 / 0.06) inset;
-
-  --glass-shadow-base: 0 8px 32px rgb(0 0 0 / 0.12);
-  --glass-shadow-hover: 0 16px 48px rgb(0 0 0 / 0.18);
-
-  /* 浅色下文字是近黑，不是深灰 —— 深灰压在接近透明的玻璃上会糊 */
-  --glass-text-rgb: 20 16 12;
-  --glass-text-primary: rgb(var(--glass-text-rgb) / 0.9);
-  --glass-text-secondary: rgb(var(--glass-text-rgb) / 0.62);
-  --glass-text-muted: rgb(var(--glass-text-rgb) / 0.45);
-
-  --glass-danger: #b91c1c;
-  --glass-danger-fg: #fff5f5;
-}
-
-:root[data-glass-palette="liquid-light"] {
-  --glass-fill-flat: 0.36;
-  --glass-fill-raised: 0.45;
-  --glass-fill-overlay: 0.58;
-  --glass-fill-modal: 0.7;
-  --glass-fill-nav: 0.42;
-  --glass-scrim: rgb(60 45 30 / 0.35);
 }

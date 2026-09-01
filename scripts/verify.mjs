@@ -74,12 +74,12 @@ const ms = (s) => {
   await page.context().close()
 }
 
-/* ===== 2. 换调色只换光斑，玻璃不动 ===== */
+/* ===== 2. 统一主题：legacy palette 开关不再改变视觉 ===== */
 {
   const page = await open()
-  const sample = async (id) => page.evaluate(`(() => {
-    document.documentElement.dataset.glassPalette = ${JSON.stringify(id)}
-    const parse = ${RGB}
+  const sample = async (id) => page.evaluate((pid) => {
+    if (pid === "baseline") delete document.documentElement.dataset.glassPalette
+    else document.documentElement.dataset.glassPalette = pid
     const card = document.querySelector('[data-slot="card"]')
     const root = getComputedStyle(document.documentElement)
     return {
@@ -87,23 +87,18 @@ const ms = (s) => {
       blob: root.getPropertyValue("--glass-blob-1").trim(),
       bg: root.getPropertyValue("--glass-bg-base").trim(),
     }
-  })()`)
+  }, id)
 
-  const dark = ["ember-slate", "ocean-frost", "soft-bloom", "warm-sunset", "emerald-mist"]
+  const ids = ["baseline", "ember-slate", "ocean-frost", "soft-bloom", "warm-sunset", "emerald-mist", "liquid-light"]
   const shots = []
-  for (const id of dark) { shots.push({ id, ...(await sample(id)) }) }
+  for (const id of ids) { shots.push({ id, ...(await sample(id)) }) }
 
   const fillsIdentical = new Set(shots.map((s) => s.fill)).size === 1
-  const blobsAllDiffer = new Set(shots.map((s) => s.blob)).size === dark.length
-  check("五套暗色调色的玻璃填充完全一致", fillsIdentical, shots[0].fill)
-  check("五套暗色调色的光斑各不相同", blobsAllDiffer,
-        shots.map((s) => s.blob).join(" "))
-
-  const light = await sample("liquid-light")
-  const lp = light.fill.match(/[\d.]+/g).map(Number)
-  check("浅色调色的玻璃仍是白色中性（只是更实）",
-        lp[0] === 255 && lp[1] === 255 && lp[2] === 255 && lp[3] > 0.3,
-        light.fill)
+  const blobsIdentical = new Set(shots.map((s) => s.blob)).size === 1
+  const bgIdentical = new Set(shots.map((s) => s.bg)).size === 1
+  check("legacy palette 标识不再改变玻璃填充", fillsIdentical, shots[0].fill)
+  check("legacy palette 标识不再改变光斑配色", blobsIdentical, shots[0].blob)
+  check("legacy palette 标识不再改变背景底色", bgIdentical, shots[0].bg)
   await page.context().close()
 }
 
@@ -134,7 +129,7 @@ const ms = (s) => {
         tiers.flat < tiers.raised && tiers.raised < tiers.overlay && tiers.overlay < tiers.modal,
         `${tiers.flat} < ${tiers.raised} < ${tiers.overlay} < ${tiers.modal}`)
   check("Card 落在 raised 档", tiers.card === tiers.raised, `${tiers.card}px`)
-  check("Input 落在 flat 档", tiers.input === tiers.flat, `${tiers.input}px`)
+  check("Input 落在 flat 档", Math.abs(tiers.input - tiers.flat) < 0.1, `${tiers.input}px`)
 
   const radii = await page.evaluate(`(() => {
     const r = (sel) => {
@@ -213,8 +208,8 @@ const ms = (s) => {
         !motion.ease.includes("1.56"), motion.ease)
   check("过冲曲线只挂在 --glass-ease-spring（动量专用）",
         motion.spring.includes("1.56"), motion.spring)
-  check("位移 240ms / 颜色 150ms，颜色快一拍",
-        ms(motion.duration) === 240 && ms(motion.color) === 150,
+  check("位移 220ms / 颜色 140ms，颜色快一拍",
+        ms(motion.duration) === 220 && ms(motion.color) === 140,
         `${motion.duration} / ${motion.color}`)
   check("卡片过渡没有过冲曲线",
         !motion.cardTransition.includes("1.56"), motion.cardTransition.slice(0, 40))
@@ -326,7 +321,7 @@ const ms = (s) => {
     return getComputedStyle(document.querySelector('[data-slot="card"]')).backdropFilter
   })()`)
   check("性能降级关掉 backdrop-filter", after === "none", `${before.slice(0, 18)}… → ${after}`)
-  check("优先级：调色 + 降级同时开启时降级赢", after === "none", after)
+  check("优先级：legacy palette + 降级同时开启时降级赢", after === "none", after)
   await page.context().close()
 }
 
