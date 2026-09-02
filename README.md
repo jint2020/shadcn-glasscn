@@ -6,7 +6,7 @@ shadcn/ui 的 Liquid Glass 主题层。暗色优先，纯 CSS，零运行时，�
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Tailwind v4](https://img.shields.io/badge/Tailwind-v4-38bdf8.svg)](https://tailwindcss.com)
 
-**[在线预览 →](https://jint2020.github.io/shadcn-glasscn/)**
+**[在线预览 →]([https://jint2020.github.io/shadcn-glasscn/](http://jint2020.github.io/shadcn-glasscn/))**
 
 <table>
 <tr>
