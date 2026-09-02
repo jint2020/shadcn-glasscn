@@ -11,20 +11,23 @@
  *   blob 2  450px  右下   delay -4s
  *   blob 3  350px  居中   delay -7s
  *
- * 只动 transform（translate + scale）。绝不动 color 或 filter ——
- * 那些属性每帧都要重新光栅化整块模糊，一动就掉帧。
+ * 只动 translate3d，绝不动 scale / color / filter ——
+ * 光斑带 blur(78px)，scale 一起动，浏览器必须逐帧重新光栅化整块模糊纹理
+ * （或让模糊半径跟着缩放"呼吸"），叠加所有玻璃面板每帧重采样，
+ * 在 MacBook Pro 这类高刷屏上直接读作频闪。纯平移只搬移已光栅化的
+ * 纹理，零重算。
  * ==========================================================================*/
 
 @keyframes glass-blob-float {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
   33% {
-    transform: translate3d(7%, -7%, 0) scale(1.08);
+    transform: translate3d(7%, -7%, 0);
   }
   66% {
-    transform: translate3d(-6%, 5%, 0) scale(0.94);
+    transform: translate3d(-6%, 5%, 0);
   }
 }
 
@@ -53,7 +56,8 @@
     z-index: -1;
     border-radius: 50%;
     pointer-events: none;
-    will-change: transform;
+    /* 不写 will-change：无限动画本身已把元素提为合成层；
+       fixed + will-change 在 WebKit 里是已知的频闪触发组合 */
     animation: glass-blob-float 10s var(--glass-ease-in-out) infinite;
   }
 
@@ -111,7 +115,6 @@
       transparent 68%
     );
     filter: blur(78px);
-    will-change: transform;
     animation: glass-blob-float 10s var(--glass-ease-in-out) -7s infinite;
   }
 }
