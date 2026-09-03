@@ -202,7 +202,8 @@
           "border": "0",
           "border-bottom": "var(--glass-border-width) solid rgb(var(--glass-white) / 0.08)",
           "border-radius": "0",
-          "box-shadow": "0 1px 0 0 rgb(var(--glass-white) / 0.06) inset"
+          "box-shadow": "0 1px 0 0 rgb(var(--glass-white) / 0.06) inset",
+          "transform": "translateZ(0)"
         },
         "@utility glass-menu": {
           "background-color": "rgb(var(--glass-white) / var(--glass-fill-floating-tier))",
@@ -328,13 +329,13 @@
         },
         "@keyframes glass-blob-float": {
           "0%, 100%": {
-            "transform": "translate3d(0, 0, 0) scale(1)"
+            "transform": "translate3d(0, 0, 0)"
           },
           "33%": {
-            "transform": "translate3d(7%, -7%, 0) scale(1.08)"
+            "transform": "translate3d(7%, -7%, 0)"
           },
           "66%": {
-            "transform": "translate3d(-6%, 5%, 0) scale(0.94)"
+            "transform": "translate3d(-6%, 5%, 0)"
           }
         },
         "@utility glass-backdrop": {
@@ -350,9 +351,7 @@
             "position": "fixed",
             "z-index": "-1",
             "border-radius": "50%",
-            "pointer-events": "none",
-            "will-change": "transform",
-            "animation": "glass-blob-float 10s var(--glass-ease-in-out) infinite"
+            "pointer-events": "none"
           },
           "&::before": {
             "width": "620px",
@@ -370,8 +369,7 @@
             "bottom": "-10%",
             "opacity": "0.42",
             "background": "radial-gradient( circle at 50% 50%, var(--glass-blob-2) 0%, transparent 68% )",
-            "filter": "blur(78px)",
-            "animation-delay": "-4s"
+            "filter": "blur(78px)"
           }
         },
         "@utility glass-blob-accent": {
@@ -388,20 +386,16 @@
             "pointer-events": "none",
             "opacity": "0.36",
             "background": "radial-gradient( circle at 50% 50%, var(--glass-blob-3) 0%, transparent 68% )",
-            "filter": "blur(78px)",
-            "will-change": "transform",
-            "animation": "glass-blob-float 10s var(--glass-ease-in-out) -7s infinite"
+            "filter": "blur(78px)"
           }
         },
         "@utility glass-reveal": {
           "opacity": "0",
           "transform": "translateY(24px)",
-          "filter": "blur(8px)",
-          "transition": "opacity var(--glass-duration-slow) var(--glass-ease), transform var(--glass-duration-slow) var(--glass-ease), filter calc(var(--glass-duration-slow) * 0.85) var(--glass-ease-out)",
+          "transition": "opacity var(--glass-duration-slow) var(--glass-ease), transform var(--glass-duration-slow) var(--glass-ease)",
           "&.is-revealed": {
             "opacity": "1",
-            "transform": "none",
-            "filter": "none"
+            "transform": "none"
           }
         },
         "@utility glass-reveal-stagger": {
@@ -634,6 +628,12 @@
             "border-color": "rgb(var(--glass-white) / 0.2)",
             "box-shadow": "0 0.5px 0 0 rgb(var(--glass-white) / 0.32) inset, var(--glass-inner-glow), var(--glass-shadow)",
             "overflow": "hidden"
+          },
+          "[data-slot=\"card\"], [data-slot=\"alert\"], [data-slot=\"input\"], [data-slot=\"textarea\"], [data-slot=\"badge\"], [data-slot=\"select-trigger\"], [data-slot=\"tabs-list\"], [data-slot=\"toggle\"], [data-slot=\"toggle-group\"], [data-slot=\"table-container\"], [data-slot=\"accordion-item\"], [data-slot=\"avatar\"], [data-slot=\"pagination-link\"], [data-slot=\"sidebar\"], [data-slot=\"switch\"], [data-slot=\"slider-track\"], [data-slot=\"button\"]:not([data-variant=\"default\"], [data-variant=\"destructive\"])": {
+            "transform": "translateZ(0)"
+          },
+          "[data-slot=\"popover-content\"], [data-slot=\"hover-card-content\"], [data-slot=\"dropdown-menu-content\"], [data-slot=\"dropdown-menu-sub-content\"], [data-slot=\"context-menu-content\"], [data-slot=\"menubar-content\"], [data-slot=\"select-content\"], [data-slot=\"tooltip-content\"], [data-slot=\"navigation-menu-content\"], [data-slot=\"navigation-menu-viewport\"], [data-slot=\"dialog-content\"], [data-slot=\"sheet-content\"], [data-slot=\"drawer-content\"], [data-slot=\"command\"]": {
+            "will-change": "transform"
           },
           "[data-slot=\"dialog-overlay\"], [data-slot=\"sheet-overlay\"], [data-slot=\"drawer-overlay\"], [data-slot=\"alert-dialog-overlay\"]": {
             "background-color": "var(--glass-scrim)",

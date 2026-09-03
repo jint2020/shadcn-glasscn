@@ -6,16 +6,16 @@
  * 玻璃只在丰富、有颜色的背景上才对。平底或灰底会产出"脏玻璃"——
  * 模糊拾取不到任何颜色，面板看起来就是一块灰板。
  *
- * 三团光斑，各自缓慢漂移：
- *   blob 1  650px  左上   opacity .55
- *   blob 2  450px  右下   delay -4s
- *   blob 3  350px  居中   delay -7s
+ * 三团光斑，默认静止，漂移是显式开启（data-glass-drift="on"）。
+ * 为什么不动：光斑一动，页面上每个 backdrop-filter 面板每帧都要
+ * 重新采样背后内容；大尺寸光斑的缓慢亮度漂移还会让 mini-LED
+ * 背光分区反复寻优。两者在 MacBook Pro 这类机器上都实测为
+ * 跨浏览器的肉眼频闪（Safari / Chrome 均复现）。"玻璃扫过不同
+ * 颜色区域"的动感来自滚动时内容掠过固定光斑，不需要自主漂移。
  *
- * 只动 translate3d，绝不动 scale / color / filter ——
- * 光斑带 blur(78px)，scale 一起动，浏览器必须逐帧重新光栅化整块模糊纹理
- * （或让模糊半径跟着缩放"呼吸"），叠加所有玻璃面板每帧重采样，
- * 在 MacBook Pro 这类高刷屏上直接读作频闪。纯平移只搬移已光栅化的
- * 纹理，零重算。
+ * 开启漂移后只动 translate3d，绝不动 scale / color / filter ——
+ * 光斑带 blur(78px)，scale 一起动，浏览器必须逐帧重新光栅化整块
+ * 模糊纹理。纯平移只搬移已光栅化的纹理，零重算。
  * ==========================================================================*/
 
 @keyframes glass-blob-float {
@@ -56,9 +56,6 @@
     z-index: -1;
     border-radius: 50%;
     pointer-events: none;
-    /* 不写 will-change：无限动画本身已把元素提为合成层；
-       fixed + will-change 在 WebKit 里是已知的频闪触发组合 */
-    animation: glass-blob-float 10s var(--glass-ease-in-out) infinite;
   }
 
   /* blob 1 —— 左上，最大最亮 */
@@ -89,7 +86,6 @@
       transparent 68%
     );
     filter: blur(78px);
-    animation-delay: -4s;
   }
 }
 
@@ -115,17 +111,39 @@
       transparent 68%
     );
     filter: blur(78px);
-    animation: glass-blob-float 10s var(--glass-ease-in-out) -7s infinite;
   }
+}
+
+/* --- 漂移：显式开启 -------------------------------------------------------- */
+/* <html data-glass-drift="on"> 整站开启，或挂在任意子树上局部开启。
+   默认不开：常驻漂移 = 每个玻璃面板每帧重采样 + 背光分区反复寻优，
+   在 MacBook Pro 上跨浏览器实测频闪（见文件头注释）。 */
+[data-glass-drift="on"] .glass-backdrop::before,
+[data-glass-drift="on"] .glass-backdrop::after,
+[data-glass-drift="on"] .glass-blob-accent::before {
+  animation: glass-blob-float 10s var(--glass-ease-in-out) infinite;
+}
+
+[data-glass-drift="on"] .glass-backdrop::after {
+  animation-delay: -4s;
+}
+
+[data-glass-drift="on"] .glass-blob-accent::before {
+  animation-delay: -7s;
 }
 
 /* --- 减少动效：光斑停在原位，但保留颜色 --------------------------------- */
 /* 关键是不要把光斑一起删掉 —— 删了玻璃就没有颜色可折射，
-   整个界面会退化成灰板。用户要的是"别动"，不是"别有颜色"。 */
+   整个界面会退化成灰板。用户要的是"别动"，不是"别有颜色"。
+   选择器里带上 data-glass-drift，特异性压过 opt-in 块，
+   保证减少动效永远赢。 */
 @media (prefers-reduced-motion: reduce) {
   .glass-backdrop::before,
   .glass-backdrop::after,
-  .glass-blob-accent::before {
+  .glass-blob-accent::before,
+  [data-glass-drift="on"] .glass-backdrop::before,
+  [data-glass-drift="on"] .glass-backdrop::after,
+  [data-glass-drift="on"] .glass-blob-accent::before {
     animation: none;
   }
 }

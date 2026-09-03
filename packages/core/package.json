@@ -1,6 +1,6 @@
 {
   "name": "glasscn-core",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Liquid Glass theme layer for shadcn/ui — dark-first glassmorphism, pure CSS, zero runtime.",
   "type": "module",
   "sideEffects": [

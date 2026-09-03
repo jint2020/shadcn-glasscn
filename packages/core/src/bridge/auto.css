@@ -255,6 +255,59 @@
     --color-background: var(--background);
   }
 
+  /* --- 合成层稳定：消除 backdrop-filter 滚动 / 重叠频闪 ------------------- */
+  /*
+   * backdrop-filter 面板在背后内容变动时逐帧重采样。某些机器（高刷屏、
+   * 特定 GPU / 驱动）上，滚动或面板重叠会让这次重采样在相邻帧间不稳定地
+   * 跳变 —— 肉眼频闪；静止时背后不变、不重采样，所以不闪。
+   *
+   * 修复：给这些面板一个稳定、不随滚动重建的合成层 backing store。
+   *   · 不靠 transform 定位的面板（卡片 / 输入 / 徽章…）：transform: translateZ(0)
+   *     hover 的 translateY 会经 transition 平滑接管，Z 归 0 无碍 —— 悬停时
+   *     背后是静止光斑，不采样变化，本就不闪。
+   *   · 靠 transform 定位的浮层（Radix 内联 transform 定位、Dialog 居中）：
+   *     不能占用 transform，改用 will-change: transform 达到同样的稳定层效果。
+   *
+   * 只加在真正有 backdrop-filter 的面板上 —— 列表项 / 表格行无 backdrop-filter，
+   * 且规范禁止它们起合成层（长列表每个 cell 一个层会掉帧），绝不纳入。
+   */
+  [data-slot="card"],
+  [data-slot="alert"],
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="badge"],
+  [data-slot="select-trigger"],
+  [data-slot="tabs-list"],
+  [data-slot="toggle"],
+  [data-slot="toggle-group"],
+  [data-slot="table-container"],
+  [data-slot="accordion-item"],
+  [data-slot="avatar"],
+  [data-slot="pagination-link"],
+  [data-slot="sidebar"],
+  [data-slot="switch"],
+  [data-slot="slider-track"],
+  [data-slot="button"]:not([data-variant="default"], [data-variant="destructive"]) {
+    transform: translateZ(0);
+  }
+
+  [data-slot="popover-content"],
+  [data-slot="hover-card-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-slot="context-menu-content"],
+  [data-slot="menubar-content"],
+  [data-slot="select-content"],
+  [data-slot="tooltip-content"],
+  [data-slot="navigation-menu-content"],
+  [data-slot="navigation-menu-viewport"],
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="drawer-content"],
+  [data-slot="command"] {
+    will-change: transform;
+  }
+
   /* --- 遮罩层：景深，不是色块 -------------------------------------------- */
 
   [data-slot="dialog-overlay"],

@@ -325,6 +325,23 @@ const ms = (s) => {
   await page.context().close()
 }
 
+/* ===== 7.5 光斑漂移:默认静止,显式开启 ===== */
+/* 常驻漂移曾在 MacBook Pro 上跨浏览器(Safari/Chrome)实测为肉眼频闪:
+ * 光斑一动,全页 backdrop-filter 面板每帧重采样,背光分区跟着反复寻优。
+ * 默认必须静止;漂移只能 data-glass-drift="on" 显式开启。 */
+{
+  const page = await open()
+  const v = await page.evaluate(`(() => {
+    const blob = () => getComputedStyle(document.querySelector(".glass-backdrop"), "::before").animationName
+    const def = blob()
+    document.documentElement.dataset.glassDrift = "on"
+    return { def, optIn: blob() }
+  })()`)
+  check("光斑默认静止(频闪防护)", v.def === "none" || v.def === "", v.def || "none")
+  check('data-glass-drift="on" 恢复漂移', v.optIn === "glass-blob-float", v.optIn)
+  await page.context().close()
+}
+
 /* ===== 8. 可覆写性 ===== */
 {
   const page = await open()

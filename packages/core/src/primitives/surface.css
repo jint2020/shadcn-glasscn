@@ -96,31 +96,45 @@
   border-bottom: var(--glass-border-width) solid rgb(var(--glass-white) / 0.08);
   border-radius: 0;
   box-shadow: 0 1px 0 0 rgb(var(--glass-white) / 0.06) inset;
+  /* 稳定合成层：nav 是 sticky，滚动时内容从下方掠过、被它的 backdrop-filter
+     采样，translateZ(0) 固定 backing store，消除滚动重采样频闪。
+     sticky 定位不占 transform，加 Z 不影响吸顶。 */
+  transform: translateZ(0);
 }
 
 /* --- 滚动边缘效果：内容掠过导航下缘时渐现 --------------------------------- */
 /* Apple 材质规范：悬浮 chrome 和内容的交界不用常驻硬分隔线，
    而是内容真正滚过导航下缘时，一道阴影从无到有渐现 --
    「滚动边缘效果，不是硬分隔线」。静止在顶部时值为 0，天然干净。
-   scroll(root y) 时间轴驱动，0..80px 滚动距离映射整段渐现；
+
+   实现：阴影挂在 ::after 伪元素上，滚动驱动的只有它的 opacity。
+   绝不在 .glass-nav 自身上用 scroll-timeline 动画 box-shadow ——
+   导航带 backdrop-filter，每帧重绘 box-shadow 会连带把整条模糊
+   逐帧重采样，滚动时读作频闪。opacity 是纯合成器属性，动它不重绘。
    不支持 scroll-driven animation 的浏览器整块 @supports 忽略，
-   退回上面的静态 hairline，行为无回退悬崖。 */
+   ::after 停在 opacity 0，退回上面的静态 hairline，无回退悬崖。 */
 
 @supports (animation-timeline: scroll()) {
-  .glass-nav {
+  /* ::after 用绝对定位贴住导航，靠导航自身的定位（sticky / fixed /
+     relative，任何导航都有）作包含块 —— 绝不在这里写 position，
+     那会是非分层规则，特异性压过 Tailwind 的 .sticky 工具类，把吸顶顶掉。 */
+  .glass-nav::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    box-shadow:
+      0 8px 16px -12px rgb(0 0 0 / 0.55),
+      0 1px 0 0 rgb(0 0 0 / 0.35);
     animation: glass-nav-edge linear both;
     animation-timeline: scroll(root y);
     animation-range: 0 80px;
   }
 
   @keyframes glass-nav-edge {
-    from { box-shadow: 0 1px 0 0 rgb(var(--glass-white) / 0.06) inset; }
-    to {
-      box-shadow:
-        0 1px 0 0 rgb(var(--glass-white) / 0.06) inset,
-        0 8px 16px -12px rgb(0 0 0 / 0.55),
-        0 1px 0 0 rgb(0 0 0 / 0.35);
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 }
 
