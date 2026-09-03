@@ -213,21 +213,52 @@ const HOMEPAGE = "https://jint2020.github.io/shadcn-glasscn"
 ### 发 npm 包
 
 `packages/core` 是纯 CSS，没有构建步骤，`files` 字段只发 `src`（npm 会另外自动带上
-`README.md` 和 `LICENSE`）。包名是无 scope 的 `glasscn-core`，所以不用建组织、
-也不用 `--access public`：
+`README.md` 和 `LICENSE`）。包名是无 scope 的 `glasscn-core`。
+
+**发布走 CI，不再手动 `npm login` / `cd` / `npm publish`。** 你本地只跑一条命令，
+CI 见到 `v*` tag 后用 OIDC 免密发布（自动带 provenance 溯源），再自动建 GitHub Release。
+
+**一次性配置（只做一次；我登不进你的 npm 账号，得你自己点）**：去 npmjs.com →
+`glasscn-core` 包 → Settings → Trusted Publisher，加一个 GitHub Actions 发布者：
+
+| 字段 | 填 |
+| --- | --- |
+| Organization or user | `jint2020` |
+| Repository | `shadcn-glasscn` |
+| Workflow filename | `release.yml` |
+| Environment name | 留空 |
+
+配完 GitHub 里**不用存任何 token**（这正是 OIDC 的意义）。
+
+**日常发版**（在干净的 `main` 上）：
 
 ```bash
-npm login          # 首次发布前，交互式登录（要过 2FA）
-cd packages/core
-npm publish        # 无 scope 公开包，默认就是 public
+pnpm release:core patch    # 或 minor / major
 ```
 
-之后每次发新版：改 `packages/core/package.json` 的 `version`（或 `npm version patch`），
-再 `npm publish`。改了 CSS 先 `pnpm registry:build`，让 registry 和 npm 两条渠道同步。
+这条命令依次做：① 查工作区干净、分支是 main → ② `pnpm registry:build` 并确认
+`registry.json` 没漂移 → ③ `pnpm verify`（建站 + 浏览器断言）→ ④ 全绿才 `npm version`
+bump、提交、打 `v*` tag → ⑤ `git push --follow-tags`。之后 GitHub Actions（`release.yml`）
+接手：干净环境里重跑 gate → OIDC 发布 → 建 Release。进度看仓库 Actions 页。
+
+> gate 在打 tag **之前**跑，所以 tag 一旦存在就代表真通过，不会留下“发了一半”的死 tag。
+> 改了 CSS 记得先在正常提交里 `pnpm registry:build` 并入库——漂移检查会在发版时挡你。
+
+**应急发版**（CI 或“CI→npm”挂了、必须马上发，罕见）：
+
+```bash
+pnpm release:core:direct patch
+```
+
+同样先跑 gate，然后本地直发——因为 OIDC 只在 CI 里成立，本地直发会拉起一次交互式
+`npm login`（过 2FA/OTP），发出去的这个版本**没有 provenance**。它照样打 tag 并 push，
+CI 见版本已在 npm 会**跳过重复发布、只补建 Release**。平时别用这条。
 
 想换成带 scope 的名字（个人 `@你的用户名/glasscn-core`，或自建组织后用 `@glasscn/core`），
 改 `packages/core/package.json` 的 `name`，同时同步 `apps/playground` 的依赖键和
-`src/styles/app.css` 里两行 `@import`，然后 `pnpm install` 重新链接。
+`src/styles/app.css` 里两行 `@import`，然后 `pnpm install` 重新链接。换 scope 后
+`publishConfig` 已含 `access: public`，CI 无需改动；但记得去 npmjs.com 给新包名**重配一次
+Trusted Publisher**（信任是绑包名的）。
 
 ---
 

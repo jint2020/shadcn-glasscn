@@ -8,7 +8,9 @@
     "build": "pnpm --filter @glasscn/playground build",
     "registry:build": "node packages/registry/build-registry.mjs && shadcn build --output apps/playground/public/r",
     "verify": "pnpm build && node scripts/verify.mjs",
-    "screenshot": "pnpm build && node scripts/screenshot.mjs"
+    "screenshot": "pnpm build && node scripts/screenshot.mjs",
+    "release:core": "node scripts/release.mjs",
+    "release:core:direct": "node scripts/release.mjs --direct"
   },
   "devDependencies": {
     "shadcn": "^4.19.0",

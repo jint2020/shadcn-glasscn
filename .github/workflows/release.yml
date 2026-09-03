@@ -1,0 +1,92 @@
+name: Release
+
+# 本地 `pnpm release:core <level>` 推来的 v* tag 触发。
+# 跑一遍 gate → OIDC 免密发布 glasscn-core(自动带 provenance)→ 建 GitHub Release。
+# 与 Pages 部署解耦:Pages 仍由 ci.yml 在 main 推送时处理,这里只管 npm + Release。
+on:
+  push:
+    tags:
+      - "v*"
+
+# OIDC 免密发布不需要任何 token:id-token 用于 OIDC 交换,contents 用于建 Release。
+permissions:
+  contents: write
+  id-token: write
+
+# 发布串行,跑到一半不要被后一个 tag 取消。
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm 版本由 package.json 的 packageManager 字段决定(当前钉 10.28.0)。
+      - uses: pnpm/action-setup@v4
+
+      # 故意不设 registry-url:它会往 .npmrc 写一行空的 _authToken=,npm 会误以为
+      # "已配置认证"而跳过 OIDC 交换,导致 ENEEDAUTH。publishConfig 已指明 registry。
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # OIDC 可信发布要求 npm ≥ 11.5.1,runner 自带的是 10.x,必须升级。
+      - name: 升级 npm 至支持 OIDC 的版本
+        run: npm install -g npm@latest
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      # registry.json 从 CSS 反推生成,顺带保证它和源码没漂移。
+      - name: 生成 registry
+        run: pnpm registry:build
+
+      - name: 校验 registry 结构
+        run: node scripts/validate-registry.mjs
+
+      # registry.json 是入库的单一事实源;它和 CSS 漂移就说明 tag 指向的 commit 不干净。
+      - name: 校验 registry 无漂移
+        run: git diff --exit-code -- registry.json
+
+      - name: 安装 Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # verify 内部会以 base "/" 重新构建 playground 再跑断言。
+      - name: 浏览器断言
+        run: pnpm verify
+
+      - name: 读取待发布版本号
+        id: v
+        run: echo "version=$(node -p "require('./packages/core/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      # 幂等:应急直发时本地已 publish 过,这里就跳过发布、只补 Release。
+      # 走到这一步已经过了数分钟 gate,npm 早已完成传播,view 能稳定命中。
+      - name: 检查该版本是否已在 npm
+        id: exists
+        run: |
+          if npm view "glasscn-core@${{ steps.v.outputs.version }}" version >/dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+            echo "glasscn-core@${{ steps.v.outputs.version }} 已存在,跳过发布。"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 发布到 npm(OIDC 免密 + provenance)
+        if: steps.exists.outputs.published == 'false'
+        working-directory: packages/core
+        run: npm publish --provenance --access public
+
+      - name: 创建 GitHub Release(自动 notes,幂等)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG 已存在,跳过。"
+          else
+            gh release create "$TAG" --generate-notes --title "$TAG"
+          fi
